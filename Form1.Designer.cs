@@ -46,6 +46,9 @@
             textUtilidad = new TextBox();
             btnGuardarEdicion = new Button();
             btnCancelarEdicion = new Button();
+            textBuscar = new TextBox();
+            label1 = new Label();
+            labelBuscar = new Label();
             ((System.ComponentModel.ISupportInitialize)tablaProductos).BeginInit();
             SuspendLayout();
             // 
@@ -223,11 +226,41 @@
             btnCancelarEdicion.Visible = false;
             btnCancelarEdicion.Click += btnCancelarEdicion_Click;
             // 
+            // textBuscar
+            // 
+            textBuscar.Location = new Point(395, 85);
+            textBuscar.Name = "textBuscar";
+            textBuscar.Size = new Size(240, 23);
+            textBuscar.TabIndex = 18;
+            textBuscar.TextChanged += textBuscar_TextChanged;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(0, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(38, 15);
+            label1.TabIndex = 19;
+            label1.Text = "label1";
+            // 
+            // labelBuscar
+            // 
+            labelBuscar.AutoSize = true;
+            labelBuscar.Location = new Point(289, 88);
+            labelBuscar.Name = "labelBuscar";
+            labelBuscar.Size = new Size(100, 15);
+            labelBuscar.TabIndex = 20;
+            labelBuscar.Text = "Buscar (Nombre):";
+            labelBuscar.Click += label2_Click_1;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(743, 450);
+            Controls.Add(labelBuscar);
+            Controls.Add(label1);
+            Controls.Add(textBuscar);
             Controls.Add(btnCancelarEdicion);
             Controls.Add(btnGuardarEdicion);
             Controls.Add(labelUtilidad);
@@ -276,5 +309,8 @@
         private Label labelUtilidad;
         private Button btnGuardarEdicion;
         private Button btnCancelarEdicion;
+        private TextBox textBuscar;
+        private Label label1;
+        private Label labelBuscar;
     }
 }

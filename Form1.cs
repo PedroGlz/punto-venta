@@ -320,6 +320,46 @@ namespace PuntoVenta
             return true;
         }
 
+        private void label2_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBuscar_TextChanged(object sender, EventArgs e)
+        {
+            FiltrarProductos(textBuscar.Text);
+        }
+
+        private void FiltrarProductos(string criterio)
+        {
+            using var db = new AppDbContext();
+
+            var productosFiltrados = db.Productos
+                .Where(p => p.Nombre.ToLower().Contains(criterio.ToLower()))
+                .Select(p => new
+                {
+                    p.ProductoId,
+                    p.Gtin,
+                    p.Nombre,
+                    p.PrecioCompra,
+                    p.PrecioVenta,
+                    p.Utilidad,
+                    p.CantidadDisponible,
+                    p.CantidadMinima
+                })
+                .ToList(); // <- Esto materializa la consulta en memoria
+
+            tablaProductos.DataSource = productosFiltrados;
+
+            // Si aún quieres ocultar la columna ProductoId
+            if (tablaProductos.Columns.Contains("ProductoId"))
+                tablaProductos.Columns["ProductoId"].Visible = false;
+
+            if (!tablaProductos.Columns.Contains("Eliminar"))
+                AgregarColumnaEliminar();
+        }
+
+
 
     }
 }
