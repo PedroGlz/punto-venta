@@ -47,8 +47,8 @@
             btnGuardarEdicion = new Button();
             btnCancelarEdicion = new Button();
             textBuscar = new TextBox();
-            label1 = new Label();
             labelBuscar = new Label();
+            menuStrip1 = new MenuStrip();
             ((System.ComponentModel.ISupportInitialize)tablaProductos).BeginInit();
             SuspendLayout();
             // 
@@ -234,15 +234,6 @@
             textBuscar.TabIndex = 18;
             textBuscar.TextChanged += textBuscar_TextChanged;
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(0, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(38, 15);
-            label1.TabIndex = 19;
-            label1.Text = "label1";
-            // 
             // labelBuscar
             // 
             labelBuscar.AutoSize = true;
@@ -253,13 +244,20 @@
             labelBuscar.Text = "Buscar (Nombre):";
             labelBuscar.Click += label2_Click_1;
             // 
+            // menuStrip1
+            // 
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(743, 24);
+            menuStrip1.TabIndex = 21;
+            menuStrip1.Text = "menuStrip1";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(743, 450);
             Controls.Add(labelBuscar);
-            Controls.Add(label1);
             Controls.Add(textBuscar);
             Controls.Add(btnCancelarEdicion);
             Controls.Add(btnGuardarEdicion);
@@ -279,6 +277,8 @@
             Controls.Add(txtPrecioCompra);
             Controls.Add(textNombre);
             Controls.Add(tablaProductos);
+            Controls.Add(menuStrip1);
+            MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Form1";
             Load += Form1_Load;
@@ -310,7 +310,7 @@
         private Button btnGuardarEdicion;
         private Button btnCancelarEdicion;
         private TextBox textBuscar;
-        private Label label1;
         private Label labelBuscar;
+        private MenuStrip menuStrip1;
     }
 }

@@ -18,7 +18,8 @@ namespace PuntoVenta
                 db.Database.EnsureCreated(); // Crea la base si no existe
             }
 
-            Application.Run(new Form1());
+            Application.Run(new MDIParent1()); // en lugar de Form1
+
         }
     }
 }
