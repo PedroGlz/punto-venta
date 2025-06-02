@@ -363,5 +363,10 @@ namespace PuntoVenta
         {
 
         }
+
+        private void textGtin_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

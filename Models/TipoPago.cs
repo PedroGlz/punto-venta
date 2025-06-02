@@ -12,3 +12,8 @@ namespace PuntoVenta.Models
         public string Tipo { get; set; } // Número de ticket consecutivo
         public int Numero { get; set; }    }
 }
+
+
+
+
+

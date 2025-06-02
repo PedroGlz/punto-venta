@@ -16,6 +16,7 @@ namespace PuntoVenta.Models
         public int NumeroProductos { get; set; }
         public decimal Pago { get; set; }
         public decimal Cambio { get; set; }
+        public decimal TipoPagoId { get; set; }
 
         // Opcional: Relación con usuario
         // public Usuario Usuario { get; set; }

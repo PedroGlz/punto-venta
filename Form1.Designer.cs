@@ -184,6 +184,7 @@
             textGtin.Name = "textGtin";
             textGtin.Size = new Size(100, 23);
             textGtin.TabIndex = 0;
+            textGtin.TextChanged += textGtin_TextChanged;
             textGtin.KeyDown += textGtin_KeyDown;
             // 
             // labelUtilidad
