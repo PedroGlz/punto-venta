@@ -17,20 +17,22 @@ namespace PuntoVenta
 
         private List<Producto> productosAgregados = new();
         private AppDbContext dbContext = new();
-        public FormVenta()
+        private Usuario usuarioActual;
+        public FormVenta(Usuario usuario)
         {
             InitializeComponent();
             labelFechaHora.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
             GenerarNuevoFolio();
             CargarTipoPagos();
             this.Shown += FormVenta_Shown; // <- Agrega esta línea
-
+            btnFinalizarVenta.Enabled = false;
+            usuarioActual = usuario;
         }
 
         private void GenerarNuevoFolio()
         {
             int maxFolio = dbContext.Ventas.Any() ? dbContext.Ventas.Max(v => v.Folio) : 0;
-            textNumTicket.Text = (maxFolio + 1).ToString();
+            textNumTicket.Text = (maxFolio + 1).ToString("D7"); // Formato de 7 dígitos
         }
         private void CargarTipoPagos()
         {
@@ -117,24 +119,26 @@ namespace PuntoVenta
 
         private void textSuPago_TextChanged(object sender, EventArgs e)
         {
-            // Asegúrate de que el total tenga un valor válido
-            if (!decimal.TryParse(labelTotal.Text, System.Globalization.NumberStyles.Currency, null, out decimal total))
+            if (!decimal.TryParse(labelTotal.Text, System.Globalization.NumberStyles.Currency, System.Globalization.CultureInfo.CurrentCulture, out decimal total))
             {
-                textSuCambio.Text = "";
+                labelSuCambio.Text = "";
+                btnFinalizarVenta.Enabled = false;
                 return;
             }
 
-            // Leer el pago ingresado por el usuario
             if (decimal.TryParse(textSuPago.Text, out decimal pago))
             {
                 decimal cambio = pago - total;
-                textSuCambio.Text = cambio >= 0 ? cambio.ToString("C") : "$0.00"; // Muestra $0 si aún no alcanza
+                labelSuCambio.Text = cambio >= 0 ? cambio.ToString("C") : "$0.00";
+                btnFinalizarVenta.Enabled = cambio >= 0;
             }
             else
             {
-                textSuCambio.Text = "";
+                labelSuCambio.Text = "";
+                btnFinalizarVenta.Enabled = false;
             }
         }
+
 
 
         private void ActualizarTablaYTotal()
@@ -154,7 +158,7 @@ namespace PuntoVenta
             labelTotal.Text = total.ToString("C"); // "C" muestra como moneda, ej. $123.00
 
             // Mostrar número de productos
-            textNumProductos.Text = productosAgregados.Count.ToString();
+            labelNumProductos.Text = productosAgregados.Count.ToString();
         }
 
         private void ConfigurarGridVenta()
@@ -232,9 +236,119 @@ namespace PuntoVenta
                     totalProductos += Convert.ToInt32(row.Cells["Cantidad"].Value);
                 }
             }
-            textNumProductos.Text = totalProductos.ToString();
+            labelNumProductos.Text = totalProductos.ToString();
         }
 
+        private void labelInfoCantidadProductos_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void labelNumProductos_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnFinalizarVenta_Click(object sender, EventArgs e)
+        {
+            if (!decimal.TryParse(labelTotal.Text, System.Globalization.NumberStyles.Currency, null, out decimal total) ||
+                !decimal.TryParse(textSuPago.Text, out decimal pago))
+            {
+                MessageBox.Show("Datos de pago inválidos.");
+                return;
+            }
+
+            if (pago < total)
+            {
+                MessageBox.Show("El pago es insuficiente.");
+                return;
+            }
+
+            if (comboBoxTipoPago.SelectedValue == null)
+            {
+                MessageBox.Show("Por favor, seleccione un tipo de pago.");
+                return;
+            }
+
+            if (!int.TryParse(comboBoxTipoPago.SelectedValue.ToString(), out int tipoPagoIdSeleccionado))
+            {
+                MessageBox.Show("El valor del tipo de pago seleccionado no es válido.");
+                return;
+            }
+
+            using var db = new AppDbContext();
+
+            var venta = new Venta
+            {
+                Folio = int.Parse(textNumTicket.Text),
+                Fecha = DateTime.Now,
+                TotalVenta = total,
+                TipoPagoId = tipoPagoIdSeleccionado,
+                UsuarioId = usuarioActual.UsuarioId // ✅ Aquí se guarda el usuario que hizo la venta
+            };
+
+            try
+            {
+                db.Ventas.Add(venta);
+                db.SaveChanges(); // importante para obtener el ID de venta
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al guardar la venta:\n{ex.InnerException?.Message ?? ex.Message}");
+                return;
+            }
+
+            foreach (DataGridViewRow row in dataGridVenta.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                string nombreProducto = row.Cells["Nombre"].Value?.ToString();
+                var producto = db.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
+
+                if (producto == null) continue;
+
+                var cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                var precioUnitario = Convert.ToDecimal(row.Cells["Precio"].Value);
+                var subtotal = Convert.ToDecimal(row.Cells["Subtotal"].Value);
+
+                var detalle = new DetalleVenta
+                {
+                    VentaId = venta.VentaId,
+                    ProductoId = producto.ProductoId,
+                    Cantidad = cantidad,
+                    PrecioUnitario = precioUnitario,
+                    Subtotal = subtotal
+                };
+
+                db.DetallesVenta.Add(detalle);
+            }
+
+            try
+            {
+                db.SaveChanges();
+                MessageBox.Show("Venta guardada correctamente.");
+                LimpiarFormularioVenta();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al guardar los detalles de la venta:\n{ex.InnerException?.Message ?? ex.Message}");
+            }
+        }
+
+
+
+        private void LimpiarFormularioVenta()
+        {
+            dataGridVenta.Rows.Clear();
+            textCodigoBarras.Clear();
+            textSuPago.Clear();
+            labelSuCambio.Text = "0000.00"; 
+            labelNumProductos.Text = "00";
+            labelTotal.Text = "$0.00";
+            GenerarNuevoFolio();
+            textCodigoBarras.Focus();
+            btnFinalizarVenta.Enabled = false;
+        }
 
 
     }

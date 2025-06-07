@@ -15,6 +15,7 @@ namespace PuntoVenta.Models
         public DbSet<Venta> Ventas { get; set; }
         public DbSet<DetalleVenta> DetallesVenta { get; set; }
         public DbSet<TipoPago> TiposPago { get; set; }
+        public DbSet<TipoUsuario> TiposUsuario { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite("Data Source=punto_venta.db");
