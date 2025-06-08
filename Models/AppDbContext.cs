@@ -26,24 +26,30 @@ namespace PuntoVenta.Models
             modelBuilder.Entity<Usuario>().HasKey(u => u.UsuarioId);
             modelBuilder.Entity<Venta>().HasKey(v => v.VentaId);
             modelBuilder.Entity<DetalleVenta>().HasKey(d => d.DetalleVentaId);
-            modelBuilder.Entity<TipoPago>().HasKey(d => d.TipoPagoId);
+            modelBuilder.Entity<TipoPago>().HasKey(tp => tp.TipoPagoId);
+            modelBuilder.Entity<Producto>().HasKey(p => p.ProductoId);
+            modelBuilder.Entity<TipoUsuario>().HasKey(tu => tu.TipoUsuarioId);
 
             // Relaciones
             modelBuilder.Entity<Venta>()
-                .HasOne<Usuario>()
+                .HasOne(v => v.Usuario)
                 .WithMany()
                 .HasForeignKey(v => v.UsuarioId);
 
+            modelBuilder.Entity<Venta>()
+                .HasOne(v => v.TipoPago)
+                .WithMany()
+                .HasForeignKey(v => v.TipoPagoId);
+
             modelBuilder.Entity<DetalleVenta>()
                 .HasOne<Venta>()
-                .WithMany()
+                .WithMany(v => v.DetallesVenta)
                 .HasForeignKey(d => d.VentaId);
 
             modelBuilder.Entity<DetalleVenta>()
                 .HasOne<Producto>()
                 .WithMany()
                 .HasForeignKey(d => d.ProductoId);
-
         }
     }
 

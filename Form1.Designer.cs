@@ -54,11 +54,11 @@
             // 
             // tablaProductos
             // 
-            tablaProductos.Anchor = AnchorStyles.None;
+            tablaProductos.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tablaProductos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             tablaProductos.Location = new Point(12, 126);
             tablaProductos.Name = "tablaProductos";
-            tablaProductos.Size = new Size(714, 312);
+            tablaProductos.Size = new Size(987, 312);
             tablaProductos.TabIndex = 8;
             tablaProductos.TabStop = false;
             tablaProductos.CellContentClick += tablaProductos_CellContentClick;
@@ -69,13 +69,13 @@
             // 
             textNombre.Location = new Point(118, 43);
             textNombre.Name = "textNombre";
-            textNombre.Size = new Size(160, 23);
+            textNombre.Size = new Size(294, 23);
             textNombre.TabIndex = 1;
             textNombre.TextChanged += textNombre_TextChanged;
             // 
             // txtPrecioCompra
             // 
-            txtPrecioCompra.Location = new Point(284, 43);
+            txtPrecioCompra.Location = new Point(420, 43);
             txtPrecioCompra.Name = "txtPrecioCompra";
             txtPrecioCompra.Size = new Size(89, 23);
             txtPrecioCompra.TabIndex = 2;
@@ -84,7 +84,7 @@
             // 
             // textCantDisponible
             // 
-            textCantDisponible.Location = new Point(538, 43);
+            textCantDisponible.Location = new Point(674, 43);
             textCantDisponible.Name = "textCantDisponible";
             textCantDisponible.Size = new Size(100, 23);
             textCantDisponible.TabIndex = 5;
@@ -93,12 +93,14 @@
             // 
             // btnAgregar
             // 
-            btnAgregar.Location = new Point(644, 81);
+            btnAgregar.BackColor = Color.FromArgb(0, 64, 0);
+            btnAgregar.ForeColor = Color.White;
+            btnAgregar.Location = new Point(877, 39);
             btnAgregar.Name = "btnAgregar";
             btnAgregar.Size = new Size(82, 29);
             btnAgregar.TabIndex = 7;
             btnAgregar.Text = "Agregar";
-            btnAgregar.UseVisualStyleBackColor = true;
+            btnAgregar.UseVisualStyleBackColor = false;
             btnAgregar.Click += btnAgregar_Click;
             // 
             // labelNombre
@@ -114,7 +116,7 @@
             // labelPrecioCompra
             // 
             labelPrecioCompra.AutoSize = true;
-            labelPrecioCompra.Location = new Point(284, 25);
+            labelPrecioCompra.Location = new Point(420, 25);
             labelPrecioCompra.Name = "labelPrecioCompra";
             labelPrecioCompra.Size = new Size(89, 15);
             labelPrecioCompra.TabIndex = 11;
@@ -124,7 +126,7 @@
             // labelCantDisponible
             // 
             labelCantDisponible.AutoSize = true;
-            labelCantDisponible.Location = new Point(538, 25);
+            labelCantDisponible.Location = new Point(674, 25);
             labelCantDisponible.Name = "labelCantDisponible";
             labelCantDisponible.Size = new Size(97, 15);
             labelCantDisponible.TabIndex = 14;
@@ -134,7 +136,7 @@
             // labelCantMin
             // 
             labelCantMin.AutoSize = true;
-            labelCantMin.Location = new Point(644, 25);
+            labelCantMin.Location = new Point(780, 25);
             labelCantMin.Name = "labelCantMin";
             labelCantMin.Size = new Size(82, 15);
             labelCantMin.TabIndex = 15;
@@ -143,7 +145,7 @@
             // 
             // textCantMin
             // 
-            textCantMin.Location = new Point(644, 43);
+            textCantMin.Location = new Point(780, 43);
             textCantMin.Name = "textCantMin";
             textCantMin.Size = new Size(82, 23);
             textCantMin.TabIndex = 6;
@@ -152,7 +154,7 @@
             // labelPrecioVenta
             // 
             labelPrecioVenta.AutoSize = true;
-            labelPrecioVenta.Location = new Point(379, 25);
+            labelPrecioVenta.Location = new Point(515, 25);
             labelPrecioVenta.Name = "labelPrecioVenta";
             labelPrecioVenta.Size = new Size(75, 15);
             labelPrecioVenta.TabIndex = 12;
@@ -161,7 +163,7 @@
             // 
             // textPrecioVenta
             // 
-            textPrecioVenta.Location = new Point(379, 43);
+            textPrecioVenta.Location = new Point(515, 43);
             textPrecioVenta.Name = "textPrecioVenta";
             textPrecioVenta.Size = new Size(75, 23);
             textPrecioVenta.TabIndex = 3;
@@ -190,7 +192,7 @@
             // labelUtilidad
             // 
             labelUtilidad.AutoSize = true;
-            labelUtilidad.Location = new Point(460, 25);
+            labelUtilidad.Location = new Point(596, 25);
             labelUtilidad.Name = "labelUtilidad";
             labelUtilidad.Size = new Size(51, 15);
             labelUtilidad.TabIndex = 13;
@@ -198,7 +200,7 @@
             // 
             // textUtilidad
             // 
-            textUtilidad.Location = new Point(460, 43);
+            textUtilidad.Location = new Point(596, 43);
             textUtilidad.Name = "textUtilidad";
             textUtilidad.ReadOnly = true;
             textUtilidad.Size = new Size(72, 23);
@@ -207,12 +209,14 @@
             // 
             // btnGuardarEdicion
             // 
+            btnGuardarEdicion.BackColor = Color.FromArgb(0, 64, 0);
+            btnGuardarEdicion.ForeColor = Color.White;
             btnGuardarEdicion.Location = new Point(12, 81);
             btnGuardarEdicion.Name = "btnGuardarEdicion";
             btnGuardarEdicion.Size = new Size(82, 29);
             btnGuardarEdicion.TabIndex = 16;
             btnGuardarEdicion.Text = "Guardar";
-            btnGuardarEdicion.UseVisualStyleBackColor = true;
+            btnGuardarEdicion.UseVisualStyleBackColor = false;
             btnGuardarEdicion.Visible = false;
             btnGuardarEdicion.Click += btnGuardarEdicion_Click;
             // 
@@ -229,7 +233,7 @@
             // 
             // textBuscar
             // 
-            textBuscar.Location = new Point(395, 85);
+            textBuscar.Location = new Point(719, 81);
             textBuscar.Name = "textBuscar";
             textBuscar.Size = new Size(240, 23);
             textBuscar.TabIndex = 18;
@@ -238,7 +242,7 @@
             // labelBuscar
             // 
             labelBuscar.AutoSize = true;
-            labelBuscar.Location = new Point(289, 88);
+            labelBuscar.Location = new Point(613, 84);
             labelBuscar.Name = "labelBuscar";
             labelBuscar.Size = new Size(100, 15);
             labelBuscar.TabIndex = 20;
@@ -249,7 +253,7 @@
             // 
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(743, 24);
+            menuStrip1.Size = new Size(1016, 24);
             menuStrip1.TabIndex = 21;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -257,7 +261,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(743, 450);
+            ClientSize = new Size(1016, 450);
             Controls.Add(labelBuscar);
             Controls.Add(textBuscar);
             Controls.Add(btnCancelarEdicion);

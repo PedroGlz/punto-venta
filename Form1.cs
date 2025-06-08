@@ -89,14 +89,15 @@ namespace PuntoVenta
             using var db = new AppDbContext();
             tablaProductos.DataSource = db.Productos.ToList();
 
-            // Oculta la columna ProductoId si existe
             if (tablaProductos.Columns.Contains("ProductoId"))
-            {
                 tablaProductos.Columns["ProductoId"].Visible = false;
-            }
+
+            if (tablaProductos.Columns.Contains("Nombre"))
+                tablaProductos.Columns["Nombre"].Width = 480;
 
             AgregarColumnaEliminar();
         }
+
 
         private void AgregarColumnaEliminar()
         {
@@ -335,7 +336,10 @@ namespace PuntoVenta
             using var db = new AppDbContext();
 
             var productosFiltrados = db.Productos
-                .Where(p => p.Nombre.ToLower().Contains(criterio.ToLower()))
+                .Where(p =>
+                    p.Nombre.ToLower().Contains(criterio.ToLower()) ||
+                    p.Gtin.Contains(criterio)
+                )
                 .Select(p => new
                 {
                     p.ProductoId,
@@ -347,17 +351,21 @@ namespace PuntoVenta
                     p.CantidadDisponible,
                     p.CantidadMinima
                 })
-                .ToList(); // <- Esto materializa la consulta en memoria
+                .ToList();
 
             tablaProductos.DataSource = productosFiltrados;
 
-            // Si aún quieres ocultar la columna ProductoId
             if (tablaProductos.Columns.Contains("ProductoId"))
                 tablaProductos.Columns["ProductoId"].Visible = false;
+
+            if (tablaProductos.Columns.Contains("Nombre"))
+                tablaProductos.Columns["Nombre"].Width = 480;
 
             if (!tablaProductos.Columns.Contains("Eliminar"))
                 AgregarColumnaEliminar();
         }
+
+
 
         private void label1_Click_1(object sender, EventArgs e)
         {

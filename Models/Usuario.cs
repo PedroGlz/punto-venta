@@ -11,6 +11,6 @@ namespace PuntoVenta.Models
         public int UsuarioId { get; set; }  // clave primaria autoincremental
         public string NombreUsuario { get; set; }
         public string Password { get; set; }
-        public string TipoUsuarioId { get; set; }
+        public int TipoUsuarioId { get; set; }
     }
 }

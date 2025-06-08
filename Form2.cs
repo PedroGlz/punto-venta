@@ -92,30 +92,59 @@ namespace PuntoVenta
         {
             if (e.KeyCode == Keys.Enter && !string.IsNullOrWhiteSpace(textCodigoBarras.Text))
             {
-                AgregarProductoPorCodigo(textCodigoBarras.Text.Trim());
+                AgregarProducto(textCodigoBarras.Text.Trim());
                 textCodigoBarras.Clear();
                 e.Handled = true;
-                e.SuppressKeyPress = true; // Evita el sonido de error
+                e.SuppressKeyPress = true;
             }
         }
 
-        private void AgregarProductoPorCodigo(string codigoBarras)
+
+        private void AgregarProducto(string entrada)
         {
             using var db = new AppDbContext();
-            var producto = db.Productos.FirstOrDefault(p => p.Gtin == codigoBarras);
 
-            if (producto == null)
+            // Buscar por código de barras exacto
+            var producto = db.Productos.FirstOrDefault(p => p.Gtin == entrada);
+
+            if (producto != null)
+            {
+                AgregarProductoAlGrid(producto);
+                return;
+            }
+
+            // Buscar coincidencias por nombre parcial
+            var productosEncontrados = db.Productos
+                .Where(p => EF.Functions.Like(p.Nombre.ToLower(), $"%{entrada.ToLower()}%"))
+                .ToList();
+
+            if (productosEncontrados.Count == 0)
             {
                 MessageBox.Show("Producto no encontrado.");
                 return;
             }
 
-            // Agregar SIEMPRE una nueva fila, sin importar si ya existe
+            if (productosEncontrados.Count == 1)
+            {
+                AgregarProductoAlGrid(productosEncontrados[0]);
+            }
+            else
+            {
+                // Mostrar formulario de selección si hay varias coincidencias
+                using var formSeleccion = new FormSeleccionProducto(productosEncontrados);
+                if (formSeleccion.ShowDialog() == DialogResult.OK && formSeleccion.ProductoSeleccionado != null)
+                {
+                    AgregarProductoAlGrid(formSeleccion.ProductoSeleccionado);
+                }
+            }
+        }
+
+        private void AgregarProductoAlGrid(Producto producto)
+        {
             dataGridVenta.Rows.Add(producto.Nombre, producto.PrecioVenta, 1, producto.PrecioVenta);
             RecalcularTotal();
             ActualizarCantidadProductos();
         }
-
 
         private void textSuPago_TextChanged(object sender, EventArgs e)
         {
@@ -172,14 +201,21 @@ namespace PuntoVenta
             dataGridVenta.Columns.Add("Cantidad", "Cantidad");
             dataGridVenta.Columns.Add("Subtotal", "Subtotal");
 
+            dataGridVenta.Columns["Nombre"].Width = 510;
+
             // Botón para eliminar
             var btnEliminar = new DataGridViewButtonColumn
             {
                 HeaderText = "Acción",
                 Name = "Eliminar",
                 Text = "Quitar",
-                UseColumnTextForButtonValue = true
+                UseColumnTextForButtonValue = true,
+                FlatStyle = FlatStyle.Flat // Mejora la apariencia
             };
+
+            // Estilo: fondo rojo y texto blanco
+            btnEliminar.DefaultCellStyle.BackColor = Color.Red;
+            btnEliminar.DefaultCellStyle.ForeColor = Color.White;
             dataGridVenta.Columns.Add(btnEliminar);
         }
 
@@ -284,7 +320,10 @@ namespace PuntoVenta
                 Fecha = DateTime.Now,
                 TotalVenta = total,
                 TipoPagoId = tipoPagoIdSeleccionado,
-                UsuarioId = usuarioActual.UsuarioId // ✅ Aquí se guarda el usuario que hizo la venta
+                UsuarioId = usuarioActual.UsuarioId, // ✅ Aquí se guarda el usuario que hizo la venta
+                NumeroProductos = int.TryParse(labelNumProductos.Text, out int numProd) ? numProd : 0,
+                Pago = pago,
+                Cambio = pago - total
             };
 
             try
@@ -342,7 +381,7 @@ namespace PuntoVenta
             dataGridVenta.Rows.Clear();
             textCodigoBarras.Clear();
             textSuPago.Clear();
-            labelSuCambio.Text = "0000.00"; 
+            labelSuCambio.Text = "0000.00";
             labelNumProductos.Text = "00";
             labelTotal.Text = "$0.00";
             GenerarNuevoFolio();
@@ -350,6 +389,14 @@ namespace PuntoVenta
             btnFinalizarVenta.Enabled = false;
         }
 
+        private void buttonCancelarVenta_Click(object sender, EventArgs e)
+        {
+            LimpiarFormularioVenta();
+        }
 
+        private void comboBoxTipoPago_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
