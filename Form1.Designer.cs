@@ -49,6 +49,7 @@
             textBuscar = new TextBox();
             labelBuscar = new Label();
             menuStrip1 = new MenuStrip();
+            buttonLimpiarBuscar = new Button();
             ((System.ComponentModel.ISupportInitialize)tablaProductos).BeginInit();
             SuspendLayout();
             // 
@@ -56,9 +57,9 @@
             // 
             tablaProductos.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tablaProductos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            tablaProductos.Location = new Point(12, 126);
+            tablaProductos.Location = new Point(12, 144);
             tablaProductos.Name = "tablaProductos";
-            tablaProductos.Size = new Size(987, 312);
+            tablaProductos.Size = new Size(1050, 294);
             tablaProductos.TabIndex = 8;
             tablaProductos.TabStop = false;
             tablaProductos.CellContentClick += tablaProductos_CellContentClick;
@@ -67,7 +68,7 @@
             // 
             // textNombre
             // 
-            textNombre.Location = new Point(118, 43);
+            textNombre.Location = new Point(221, 43);
             textNombre.Name = "textNombre";
             textNombre.Size = new Size(294, 23);
             textNombre.TabIndex = 1;
@@ -75,7 +76,7 @@
             // 
             // txtPrecioCompra
             // 
-            txtPrecioCompra.Location = new Point(420, 43);
+            txtPrecioCompra.Location = new Point(523, 43);
             txtPrecioCompra.Name = "txtPrecioCompra";
             txtPrecioCompra.Size = new Size(89, 23);
             txtPrecioCompra.TabIndex = 2;
@@ -84,7 +85,7 @@
             // 
             // textCantDisponible
             // 
-            textCantDisponible.Location = new Point(674, 43);
+            textCantDisponible.Location = new Point(777, 43);
             textCantDisponible.Name = "textCantDisponible";
             textCantDisponible.Size = new Size(100, 23);
             textCantDisponible.TabIndex = 5;
@@ -95,7 +96,7 @@
             // 
             btnAgregar.BackColor = Color.FromArgb(0, 64, 0);
             btnAgregar.ForeColor = Color.White;
-            btnAgregar.Location = new Point(877, 39);
+            btnAgregar.Location = new Point(980, 39);
             btnAgregar.Name = "btnAgregar";
             btnAgregar.Size = new Size(82, 29);
             btnAgregar.TabIndex = 7;
@@ -106,7 +107,7 @@
             // labelNombre
             // 
             labelNombre.AutoSize = true;
-            labelNombre.Location = new Point(118, 25);
+            labelNombre.Location = new Point(221, 25);
             labelNombre.Name = "labelNombre";
             labelNombre.Size = new Size(54, 15);
             labelNombre.TabIndex = 10;
@@ -116,7 +117,7 @@
             // labelPrecioCompra
             // 
             labelPrecioCompra.AutoSize = true;
-            labelPrecioCompra.Location = new Point(420, 25);
+            labelPrecioCompra.Location = new Point(523, 25);
             labelPrecioCompra.Name = "labelPrecioCompra";
             labelPrecioCompra.Size = new Size(89, 15);
             labelPrecioCompra.TabIndex = 11;
@@ -126,7 +127,7 @@
             // labelCantDisponible
             // 
             labelCantDisponible.AutoSize = true;
-            labelCantDisponible.Location = new Point(674, 25);
+            labelCantDisponible.Location = new Point(777, 25);
             labelCantDisponible.Name = "labelCantDisponible";
             labelCantDisponible.Size = new Size(97, 15);
             labelCantDisponible.TabIndex = 14;
@@ -136,7 +137,7 @@
             // labelCantMin
             // 
             labelCantMin.AutoSize = true;
-            labelCantMin.Location = new Point(780, 25);
+            labelCantMin.Location = new Point(883, 25);
             labelCantMin.Name = "labelCantMin";
             labelCantMin.Size = new Size(82, 15);
             labelCantMin.TabIndex = 15;
@@ -145,7 +146,7 @@
             // 
             // textCantMin
             // 
-            textCantMin.Location = new Point(780, 43);
+            textCantMin.Location = new Point(883, 43);
             textCantMin.Name = "textCantMin";
             textCantMin.Size = new Size(82, 23);
             textCantMin.TabIndex = 6;
@@ -154,7 +155,7 @@
             // labelPrecioVenta
             // 
             labelPrecioVenta.AutoSize = true;
-            labelPrecioVenta.Location = new Point(515, 25);
+            labelPrecioVenta.Location = new Point(618, 25);
             labelPrecioVenta.Name = "labelPrecioVenta";
             labelPrecioVenta.Size = new Size(75, 15);
             labelPrecioVenta.TabIndex = 12;
@@ -163,7 +164,7 @@
             // 
             // textPrecioVenta
             // 
-            textPrecioVenta.Location = new Point(515, 43);
+            textPrecioVenta.Location = new Point(618, 43);
             textPrecioVenta.Name = "textPrecioVenta";
             textPrecioVenta.Size = new Size(75, 23);
             textPrecioVenta.TabIndex = 3;
@@ -184,7 +185,7 @@
             // 
             textGtin.Location = new Point(12, 43);
             textGtin.Name = "textGtin";
-            textGtin.Size = new Size(100, 23);
+            textGtin.Size = new Size(203, 23);
             textGtin.TabIndex = 0;
             textGtin.TextChanged += textGtin_TextChanged;
             textGtin.KeyDown += textGtin_KeyDown;
@@ -192,7 +193,7 @@
             // labelUtilidad
             // 
             labelUtilidad.AutoSize = true;
-            labelUtilidad.Location = new Point(596, 25);
+            labelUtilidad.Location = new Point(699, 25);
             labelUtilidad.Name = "labelUtilidad";
             labelUtilidad.Size = new Size(51, 15);
             labelUtilidad.TabIndex = 13;
@@ -200,7 +201,7 @@
             // 
             // textUtilidad
             // 
-            textUtilidad.Location = new Point(596, 43);
+            textUtilidad.Location = new Point(699, 43);
             textUtilidad.Name = "textUtilidad";
             textUtilidad.ReadOnly = true;
             textUtilidad.Size = new Size(72, 23);
@@ -233,35 +234,46 @@
             // 
             // textBuscar
             // 
-            textBuscar.Location = new Point(719, 81);
+            textBuscar.Location = new Point(699, 113);
             textBuscar.Name = "textBuscar";
-            textBuscar.Size = new Size(240, 23);
+            textBuscar.Size = new Size(301, 23);
             textBuscar.TabIndex = 18;
             textBuscar.TextChanged += textBuscar_TextChanged;
             // 
             // labelBuscar
             // 
             labelBuscar.AutoSize = true;
-            labelBuscar.Location = new Point(613, 84);
+            labelBuscar.Location = new Point(514, 116);
             labelBuscar.Name = "labelBuscar";
-            labelBuscar.Size = new Size(100, 15);
+            labelBuscar.Size = new Size(179, 15);
             labelBuscar.TabIndex = 20;
-            labelBuscar.Text = "Buscar (Nombre):";
+            labelBuscar.Text = "Buscar (Nombre/Código Barras):";
             labelBuscar.Click += label2_Click_1;
             // 
             // menuStrip1
             // 
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1016, 24);
+            menuStrip1.Size = new Size(1079, 24);
             menuStrip1.TabIndex = 21;
             menuStrip1.Text = "menuStrip1";
+            // 
+            // buttonLimpiarBuscar
+            // 
+            buttonLimpiarBuscar.Location = new Point(1006, 110);
+            buttonLimpiarBuscar.Name = "buttonLimpiarBuscar";
+            buttonLimpiarBuscar.Size = new Size(56, 26);
+            buttonLimpiarBuscar.TabIndex = 22;
+            buttonLimpiarBuscar.Text = "Borrar";
+            buttonLimpiarBuscar.UseVisualStyleBackColor = true;
+            buttonLimpiarBuscar.Click += buttonLimpiarBuscar_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1016, 450);
+            ClientSize = new Size(1079, 450);
+            Controls.Add(buttonLimpiarBuscar);
             Controls.Add(labelBuscar);
             Controls.Add(textBuscar);
             Controls.Add(btnCancelarEdicion);
@@ -317,5 +329,6 @@
         private TextBox textBuscar;
         private Label labelBuscar;
         private MenuStrip menuStrip1;
+        private Button buttonLimpiarBuscar;
     }
 }

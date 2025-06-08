@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Linq;
+
 
 namespace PuntoVenta
 {
@@ -12,12 +14,38 @@ namespace PuntoVenta
         public FormSeleccionProducto(List<Producto> productos)
         {
             InitializeComponent();
-            dataGridViewProductos.DataSource = productos;
+
+            // Ordenar la lista por nombre ascendentemente
+            var productosOrdenados = productos.OrderBy(p => p.Nombre).ToList();
+
+            dataGridViewProductos.AutoGenerateColumns = false;
+            dataGridViewProductos.Columns.Clear();
+
+            var colNombre = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "nombre",
+                HeaderText = "Producto",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            };
+
+            var colPrecio = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "precioVenta",
+                HeaderText = "Precio",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                DefaultCellStyle = { Format = "C2" }
+            };
+
+            dataGridViewProductos.Columns.Add(colNombre);
+            dataGridViewProductos.Columns.Add(colPrecio);
+
+            // Asignar los productos ya ordenados
+            dataGridViewProductos.DataSource = productosOrdenados;
         }
+
 
         private void FormSeleccionProducto_Load(object sender, EventArgs e)
         {
-            // Aquí puedes ajustar la visualización si es necesario
             dataGridViewProductos.ClearSelection();
         }
 

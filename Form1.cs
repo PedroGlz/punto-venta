@@ -87,7 +87,9 @@ namespace PuntoVenta
         private void CargarProductos()
         {
             using var db = new AppDbContext();
-            tablaProductos.DataSource = db.Productos.ToList();
+            tablaProductos.DataSource = db.Productos
+                .OrderBy(p => p.Nombre)
+                .ToList();
 
             if (tablaProductos.Columns.Contains("ProductoId"))
                 tablaProductos.Columns["ProductoId"].Visible = false;
@@ -340,6 +342,7 @@ namespace PuntoVenta
                     p.Nombre.ToLower().Contains(criterio.ToLower()) ||
                     p.Gtin.Contains(criterio)
                 )
+                .OrderBy(p => p.Nombre)
                 .Select(p => new
                 {
                     p.ProductoId,
@@ -367,6 +370,7 @@ namespace PuntoVenta
 
 
 
+
         private void label1_Click_1(object sender, EventArgs e)
         {
 
@@ -375,6 +379,12 @@ namespace PuntoVenta
         private void textGtin_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void buttonLimpiarBuscar_Click(object sender, EventArgs e)
+        {
+            textBuscar.Text = "";       // Limpiar el campo de búsqueda
+            CargarProductos();          // Cargar todos los productos sin filtro
         }
     }
 }
