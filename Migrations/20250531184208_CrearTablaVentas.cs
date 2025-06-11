@@ -20,10 +20,10 @@ namespace PuntoVenta.Migrations
                     Gtin = table.Column<string>(type: "TEXT", nullable: false),
                     Nombre = table.Column<string>(type: "TEXT", nullable: false),
                     PrecioCompra = table.Column<decimal>(type: "TEXT", nullable: false),
-                    PrecioVenta = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Utilidad = table.Column<decimal>(type: "TEXT", nullable: false),
+                    PrecioVentaUnitario = table.Column<decimal>(type: "TEXT", nullable: false),
+                    UtilidadUnitaria = table.Column<decimal>(type: "TEXT", nullable: false),
                     CantidadDisponible = table.Column<int>(type: "INTEGER", nullable: false),
-                    CantidadMinima = table.Column<int>(type: "INTEGER", nullable: false)
+                    CantidadMinimaDisponible = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -30,7 +30,7 @@ namespace PuntoVenta
 
             var colPrecio = new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "precioVenta",
+                DataPropertyName = "PrecioVentaUnitario",
                 HeaderText = "Precio",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 DefaultCellStyle = { Format = "C2" }

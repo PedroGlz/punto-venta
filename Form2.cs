@@ -141,7 +141,7 @@ namespace PuntoVenta
 
         private void AgregarProductoAlGrid(Producto producto)
         {
-            dataGridVenta.Rows.Add(producto.Nombre, producto.PrecioVenta, 1, producto.PrecioVenta);
+            dataGridVenta.Rows.Add(producto.Nombre, producto.PrecioVentaUnitario, 1, producto.PrecioVentaUnitario);
             RecalcularTotal();
             ActualizarCantidadProductos();
         }
@@ -176,14 +176,14 @@ namespace PuntoVenta
             var datosParaMostrar = productosAgregados.Select(p => new
             {
                 p.Nombre,
-                p.PrecioVenta
+                p.PrecioVentaUnitario
             }).ToList();
 
             dataGridVenta.DataSource = null;
             dataGridVenta.DataSource = datosParaMostrar;
 
             // Calcular el total
-            decimal total = productosAgregados.Sum(p => p.PrecioVenta);
+            decimal total = productosAgregados.Sum(p => p.PrecioVentaUnitario);
             labelTotal.Text = total.ToString("C"); // "C" muestra como moneda, ej. $123.00
 
             // Mostrar número de productos
@@ -395,6 +395,11 @@ namespace PuntoVenta
         }
 
         private void comboBoxTipoPago_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textNumTicket_TextChanged(object sender, EventArgs e)
         {
 
         }

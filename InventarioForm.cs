@@ -2,45 +2,33 @@ using PuntoVenta.Models;
 
 namespace PuntoVenta
 {
-    public partial class Form1 : Form
+    public partial class InventarioForm : Form
     {
         private int? selectedProductoId = null;
-
-        public Form1()
+        private Usuario usuarioActual;
+        public InventarioForm(Usuario usuario)
         {
             InitializeComponent();
             CargarProductos();
+            usuarioActual = usuario;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             textGtin.Focus();
-            tablaProductos.ReadOnly = true;                  // Impide edición directa de celdas
-            tablaProductos.AllowUserToAddRows = false;       // Evita que agreguen filas desde la interfaz
-            tablaProductos.AllowUserToDeleteRows = false;    // Evita eliminación directa
+            tablaProductos.ReadOnly = true;
+            tablaProductos.AllowUserToAddRows = false;
+            tablaProductos.AllowUserToDeleteRows = false;
             tablaProductos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox3_TextChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-
             if (!ValidarCampos())
                 return;
 
             using var db = new AppDbContext();
 
-            // Verificar si el GTIN ya existe
             if (db.Productos.Any(p => p.Gtin == textGtin.Text))
             {
                 MessageBox.Show("Ya existe un producto con ese GTIN.", "GTIN duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -54,10 +42,15 @@ namespace PuntoVenta
                     Gtin = textGtin.Text,
                     Nombre = textNombre.Text,
                     PrecioCompra = decimal.Parse(txtPrecioCompra.Text),
-                    PrecioVenta = decimal.Parse(textPrecioVenta.Text),
-                    Utilidad = decimal.Parse(textUtilidad.Text),
-                    CantidadDisponible = int.Parse(textCantDisponible.Text), // Fixed conversion to int
-                    CantidadMinima = int.Parse(textCantMin.Text) // Fixed conversion to int
+                    PrecioVentaUnitario = decimal.Parse(textPrecioVentaUnitario.Text),
+                    UtilidadUnitaria = decimal.Parse(textUtilidadUnitaria.Text),
+                    PrecioVentaMayoreo = decimal.Parse(textPrecioVentaMayoreo.Text),
+                    UtilidadMayoreo = decimal.Parse(textUtilidadMayoreo.Text),
+                    CantidadMinimaMayoreo = int.Parse(textCantMinMayoreo.Text),
+                    CantidadDisponible = int.Parse(textCantDisponible.Text),
+                    CantidadMinimaDisponible = int.Parse(textCantMin.Text),
+                    FechaCreacion = DateTime.Now,
+                    CreadoPor = usuarioActual.UsuarioId
                 };
 
                 db.Productos.Add(producto);
@@ -73,7 +66,6 @@ namespace PuntoVenta
             }
         }
 
-        // Agrega este método para capturar y mostrar el KeyCode en consola:
         private void textGtin_KeyDown(object sender, KeyEventArgs e)
         {
             Console.WriteLine($"KeyCode: {e.KeyCode}");
@@ -99,7 +91,6 @@ namespace PuntoVenta
 
             AgregarColumnaEliminar();
         }
-
 
         private void AgregarColumnaEliminar()
         {
@@ -153,14 +144,16 @@ namespace PuntoVenta
             }
         }
 
-
         private void LimpiarCampos()
         {
             textGtin.Text = "";
             textNombre.Text = "";
             txtPrecioCompra.Text = "";
-            textPrecioVenta.Text = "";
-            textUtilidad.Text = "";
+            textPrecioVentaUnitario.Text = "";
+            textUtilidadUnitaria.Text = "";
+            textPrecioVentaMayoreo.Text = "";
+            textUtilidadMayoreo.Text = "";
+            textCantMinMayoreo.Text = "";
             textCantDisponible.Text = "";
             textCantMin.Text = "";
             selectedProductoId = null;
@@ -176,10 +169,13 @@ namespace PuntoVenta
                 textGtin.Text = fila.Cells["Gtin"].Value.ToString();
                 textNombre.Text = fila.Cells["Nombre"].Value.ToString();
                 txtPrecioCompra.Text = fila.Cells["PrecioCompra"].Value.ToString();
-                textPrecioVenta.Text = fila.Cells["PrecioVenta"].Value.ToString();
-                textUtilidad.Text = fila.Cells["Utilidad"].Value.ToString();
+                textPrecioVentaUnitario.Text = fila.Cells["PrecioVentaUnitario"].Value.ToString();
+                textUtilidadUnitaria.Text = fila.Cells["UtilidadUnitaria"].Value.ToString();
+                textPrecioVentaMayoreo.Text = fila.Cells["PrecioVentaMayoreo"].Value.ToString();
+                textUtilidadMayoreo.Text = fila.Cells["UtilidadMayoreo"].Value.ToString();
+                textCantMinMayoreo.Text = fila.Cells["CantidadMinimaMayoreo"].Value.ToString();
                 textCantDisponible.Text = fila.Cells["CantidadDisponible"].Value.ToString();
-                textCantMin.Text = fila.Cells["CantidadMinima"].Value.ToString();
+                textCantMin.Text = fila.Cells["CantidadMinimaDisponible"].Value.ToString();
 
                 btnAgregar.Visible = false;
                 btnGuardarEdicion.Visible = true;
@@ -187,30 +183,12 @@ namespace PuntoVenta
             }
         }
 
-        private void textNombre_TextChanged(object sender, EventArgs e) { }
-        private void label1_Click(object sender, EventArgs e) { }
-        private void label2_Click(object sender, EventArgs e) { }
-        private void label3_Click(object sender, EventArgs e) { }
-        private void label4_Click(object sender, EventArgs e) { }
-        private void label5_Click(object sender, EventArgs e) { }
-        private void label6_Click(object sender, EventArgs e) { }
-
         private void btnGuardarEdicion_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos())
                 return;
 
             using var db = new AppDbContext();
-
-            //// Verificar duplicado solo si es un nuevo producto o cambió el GTIN
-            //var gtinExiste = db.Productos
-            //    .Any(p => p.Gtin == textGtin.Text && p.ProductoId != selectedProductoId);
-
-            //if (gtinExiste)
-            //{
-            //    MessageBox.Show("El GTIN ya está registrado para otro producto.");
-            //    return;
-            //}
 
             Producto producto;
 
@@ -232,10 +210,13 @@ namespace PuntoVenta
             producto.Gtin = textGtin.Text;
             producto.Nombre = textNombre.Text;
             producto.PrecioCompra = decimal.Parse(txtPrecioCompra.Text);
-            producto.PrecioVenta = decimal.Parse(textPrecioVenta.Text);
-            producto.Utilidad = decimal.Parse(textUtilidad.Text);
-            producto.CantidadDisponible = int.Parse(textCantDisponible.Text); // Fixed conversion to int
-            producto.CantidadMinima = int.Parse(textCantMin.Text);
+            producto.PrecioVentaUnitario = decimal.Parse(textPrecioVentaUnitario.Text);
+            producto.UtilidadUnitaria = decimal.Parse(textUtilidadUnitaria.Text);
+            producto.PrecioVentaMayoreo = decimal.Parse(textPrecioVentaMayoreo.Text);
+            producto.UtilidadMayoreo = decimal.Parse(textUtilidadMayoreo.Text);
+            producto.CantidadMinimaMayoreo = int.Parse(textCantMinMayoreo.Text);
+            producto.CantidadDisponible = int.Parse(textCantDisponible.Text);
+            producto.CantidadMinimaDisponible = int.Parse(textCantMin.Text);
 
             db.SaveChanges();
 
@@ -243,67 +224,63 @@ namespace PuntoVenta
             LimpiarCampos();
             CargarProductos();
 
-            // Volver a modo agregar
             selectedProductoId = null;
             btnAgregar.Visible = true;
             btnGuardarEdicion.Visible = false;
             btnCancelarEdicion.Visible = false;
-
-
         }
 
         private void btnCancelarEdicion_Click(object sender, EventArgs e)
         {
             selectedProductoId = null;
             LimpiarCampos();
-            // Volver a modo agregar
-            selectedProductoId = null;
             btnAgregar.Visible = true;
             btnGuardarEdicion.Visible = false;
             btnCancelarEdicion.Visible = false;
         }
 
-        private void CalcularUtilidad()
+        private void CalcularUtilidadUnitaria()
         {
             if (decimal.TryParse(txtPrecioCompra.Text, out decimal precioCompra) &&
-                decimal.TryParse(textPrecioVenta.Text, out decimal precioVenta))
+                decimal.TryParse(textPrecioVentaUnitario.Text, out decimal precioVenta))
             {
                 decimal utilidad = precioVenta - precioCompra;
-                textUtilidad.Text = utilidad.ToString("0.00");
+                textUtilidadUnitaria.Text = utilidad.ToString("0.00");
             }
             else
             {
-                textUtilidad.Text = "";
+                textUtilidadUnitaria.Text = "";
+            }
+        }
+
+        private void CalcularUtilidadMayoreo()
+        {
+            if (decimal.TryParse(txtPrecioCompra.Text, out decimal precioCompra) &&
+                decimal.TryParse(textPrecioVentaMayoreo.Text, out decimal precioMayoreo))
+            {
+                decimal utilidad = precioMayoreo - precioCompra;
+                textUtilidadMayoreo.Text = utilidad.ToString("0.00");
+            }
+            else
+            {
+                textUtilidadMayoreo.Text = "";
             }
         }
 
         private void txtPrecioCompra_TextChanged(object sender, EventArgs e)
         {
-            CalcularUtilidad();
+            CalcularUtilidadUnitaria();
+            CalcularUtilidadMayoreo();
         }
 
-        private void textPrecioVenta_TextChanged(object sender, EventArgs e)
+        private void textPrecioVentaUnitario_TextChanged(object sender, EventArgs e)
         {
-            CalcularUtilidad();
+            CalcularUtilidadUnitaria();
         }
 
-        private void SoloNumerosDecimalesPositivos(object sender, KeyPressEventArgs e)
+        private void textPrecioVentaMayoreo_TextChanged(object sender, EventArgs e)
         {
-            TextBox textBox = sender as TextBox;
-
-            // Permitir teclas de control como backspace
-            if (char.IsControl(e.KeyChar))
-                return;
-
-            // Permitir solo dígitos y un punto decimal (no al inicio y no duplicado)
-            if (!char.IsDigit(e.KeyChar))
-            {
-                if (e.KeyChar == '.' && !textBox.Text.Contains(".") && textBox.SelectionStart != 0)
-                    return;
-
-                // Bloquear todo lo demás (como letras o '-')
-                e.Handled = true;
-            }
+            CalcularUtilidadMayoreo();
         }
 
         private bool ValidarCampos()
@@ -311,8 +288,11 @@ namespace PuntoVenta
             if (string.IsNullOrWhiteSpace(textGtin.Text) ||
                 string.IsNullOrWhiteSpace(textNombre.Text) ||
                 string.IsNullOrWhiteSpace(txtPrecioCompra.Text) ||
-                string.IsNullOrWhiteSpace(textPrecioVenta.Text) ||
-                string.IsNullOrWhiteSpace(textUtilidad.Text) ||
+                string.IsNullOrWhiteSpace(textPrecioVentaUnitario.Text) ||
+                string.IsNullOrWhiteSpace(textUtilidadUnitaria.Text) ||
+                string.IsNullOrWhiteSpace(textPrecioVentaMayoreo.Text) ||
+                string.IsNullOrWhiteSpace(textUtilidadMayoreo.Text) ||
+                string.IsNullOrWhiteSpace(textCantMinMayoreo.Text) ||
                 string.IsNullOrWhiteSpace(textCantDisponible.Text) ||
                 string.IsNullOrWhiteSpace(textCantMin.Text))
             {
@@ -321,11 +301,6 @@ namespace PuntoVenta
             }
 
             return true;
-        }
-
-        private void label2_Click_1(object sender, EventArgs e)
-        {
-
         }
 
         private void textBuscar_TextChanged(object sender, EventArgs e)
@@ -343,17 +318,6 @@ namespace PuntoVenta
                     p.Gtin.Contains(criterio)
                 )
                 .OrderBy(p => p.Nombre)
-                .Select(p => new
-                {
-                    p.ProductoId,
-                    p.Gtin,
-                    p.Nombre,
-                    p.PrecioCompra,
-                    p.PrecioVenta,
-                    p.Utilidad,
-                    p.CantidadDisponible,
-                    p.CantidadMinima
-                })
                 .ToList();
 
             tablaProductos.DataSource = productosFiltrados;
@@ -368,23 +332,10 @@ namespace PuntoVenta
                 AgregarColumnaEliminar();
         }
 
-
-
-
-        private void label1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textGtin_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void buttonLimpiarBuscar_Click(object sender, EventArgs e)
         {
-            textBuscar.Text = "";       // Limpiar el campo de búsqueda
-            CargarProductos();          // Cargar todos los productos sin filtro
+            textBuscar.Text = "";
+            CargarProductos();
         }
     }
 }

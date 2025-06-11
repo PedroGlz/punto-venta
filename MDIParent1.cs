@@ -28,7 +28,7 @@ namespace PuntoVenta
             this.Text = $"Punto de Venta - Sesión de: {usuarioActual.NombreUsuario}";
         }
 
-        // ✅ Método genérico para abrir formularios hijos dentro del MDI
+        // ✅ Método genérico para abrir formularios hijos sin parámetros
         private void AbrirFormulario<T>() where T : Form, new()
         {
             foreach (Form form in this.MdiChildren)
@@ -44,7 +44,7 @@ namespace PuntoVenta
             formulario.Show();
         }
 
-        // Si deseas pasar el usuario al formulario hijo, crea una sobrecarga como esta:
+        // ✅ Método para abrir formularios hijos que reciben Usuario
         private void AbrirFormularioConUsuario<T>() where T : Form
         {
             foreach (Form form in this.MdiChildren)
@@ -59,19 +59,17 @@ namespace PuntoVenta
             formulario.Show();
         }
 
-        // Evento del menú para abrir el CRUD de productos
+        // ✅ Abrir Inventario con el Usuario
         private void inventarioToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AbrirFormulario<Form1>();
+            AbrirFormularioConUsuario<InventarioForm>(); // CORREGIDO
         }
 
         private void ventaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Puedes usar AbrirFormulario<FormVenta>() si no requiere el usuario
-            AbrirFormularioConUsuario<FormVenta>(); // Si FormVenta necesita el usuario
+            AbrirFormularioConUsuario<FormVenta>();
         }
 
-        // Métodos del menú
         private void ExitToolsStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();

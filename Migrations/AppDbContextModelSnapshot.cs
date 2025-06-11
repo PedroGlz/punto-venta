@@ -50,7 +50,7 @@ namespace PuntoVenta.Migrations
                     b.Property<int>("CantidadDisponible")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CantidadMinima")
+                    b.Property<int>("CantidadMinimaDisponible")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Gtin")
@@ -64,10 +64,10 @@ namespace PuntoVenta.Migrations
                     b.Property<decimal>("PrecioCompra")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("PrecioVenta")
+                    b.Property<decimal>("PrecioVentaUnitario")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Utilidad")
+                    b.Property<decimal>("UtilidadUnitaria")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ProductoId");
