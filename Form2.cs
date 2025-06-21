@@ -14,17 +14,17 @@ namespace PuntoVenta
 {
     public partial class FormVenta : Form
     {
-
         private List<Producto> productosAgregados = new();
         private AppDbContext dbContext = new();
         private Usuario usuarioActual;
+
         public FormVenta(Usuario usuario)
         {
             InitializeComponent();
             labelFechaHora.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
             GenerarNuevoFolio();
             CargarTipoPagos();
-            this.Shown += FormVenta_Shown; // <- Agrega esta línea
+            this.Shown += FormVenta_Shown;
             btnFinalizarVenta.Enabled = false;
             usuarioActual = usuario;
         }
@@ -32,8 +32,9 @@ namespace PuntoVenta
         private void GenerarNuevoFolio()
         {
             int maxFolio = dbContext.Ventas.Any() ? dbContext.Ventas.Max(v => v.Folio) : 0;
-            textNumTicket.Text = (maxFolio + 1).ToString("D7"); // Formato de 7 dígitos
+            textNumTicket.Text = (maxFolio + 1).ToString("D7");
         }
+
         private void CargarTipoPagos()
         {
             using var db = new AppDbContext();
@@ -43,7 +44,6 @@ namespace PuntoVenta
             comboBoxTipoPago.DisplayMember = "Tipo";
             comboBoxTipoPago.ValueMember = "TipoPagoId";
 
-            // Seleccionar por defecto el tipo con TipoPagoId = 1
             var index = tipos.FindIndex(t => t.TipoPagoId == 1);
             if (index >= 0)
             {
@@ -51,41 +51,14 @@ namespace PuntoVenta
             }
         }
 
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void FormVenta_Load(object sender, EventArgs e)
         {
             ConfigurarGridVenta();
-            dataGridVenta.CellClick += dataGridVenta_CellClick;
         }
 
         private void FormVenta_Shown(object sender, EventArgs e)
         {
             textCodigoBarras.Focus();
-        }
-
-        private void textCodigoBarras_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void textCodigoBarras_KeyDown(object sender, KeyEventArgs e)
@@ -99,21 +72,17 @@ namespace PuntoVenta
             }
         }
 
-
         private void AgregarProducto(string entrada)
         {
             using var db = new AppDbContext();
 
-            // Buscar por código de barras exacto
             var producto = db.Productos.FirstOrDefault(p => p.Gtin == entrada);
-
             if (producto != null)
             {
                 AgregarProductoAlGrid(producto);
                 return;
             }
 
-            // Buscar coincidencias por nombre parcial
             var productosEncontrados = db.Productos
                 .Where(p => EF.Functions.Like(p.Nombre.ToLower(), $"%{entrada.ToLower()}%"))
                 .ToList();
@@ -130,7 +99,6 @@ namespace PuntoVenta
             }
             else
             {
-                // Mostrar formulario de selección si hay varias coincidencias
                 using var formSeleccion = new FormSeleccionProducto(productosEncontrados);
                 if (formSeleccion.ShowDialog() == DialogResult.OK && formSeleccion.ProductoSeleccionado != null)
                 {
@@ -141,116 +109,85 @@ namespace PuntoVenta
 
         private void AgregarProductoAlGrid(Producto producto)
         {
-            dataGridVenta.Rows.Add(producto.Nombre, producto.PrecioVentaUnitario, 1, producto.PrecioVentaUnitario);
+            foreach (DataGridViewRow fila in dataGridVenta.Rows)
+            {
+                if (fila.Cells["Nombre"].Value?.ToString() == producto.Nombre)
+                {
+                    int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
+                    cantidadActual++;
+                    fila.Cells["Cantidad"].Value = cantidadActual;
+
+                    decimal precioVentaUnitario = Convert.ToDecimal(fila.Cells["PrecioVentaUnitario"].Value);
+                    fila.Cells["Subtotal"].Value = (precioVentaUnitario * cantidadActual).ToString("0.00");
+
+                    RecalcularTotal();
+                    ActualizarCantidadProductos();
+                    return;
+                }
+            }
+
+            decimal precio = producto.PrecioVentaUnitario;
+            dataGridVenta.Rows.Add(producto.Nombre, precio.ToString("0.00"), 1, precio.ToString("0.00"));
+
             RecalcularTotal();
             ActualizarCantidadProductos();
         }
 
-        private void textSuPago_TextChanged(object sender, EventArgs e)
-        {
-            if (!decimal.TryParse(labelTotal.Text, System.Globalization.NumberStyles.Currency, System.Globalization.CultureInfo.CurrentCulture, out decimal total))
-            {
-                labelSuCambio.Text = "";
-                btnFinalizarVenta.Enabled = false;
-                return;
-            }
-
-            if (decimal.TryParse(textSuPago.Text, out decimal pago))
-            {
-                decimal cambio = pago - total;
-                labelSuCambio.Text = cambio >= 0 ? cambio.ToString("C") : "$0.00";
-                btnFinalizarVenta.Enabled = cambio >= 0;
-            }
-            else
-            {
-                labelSuCambio.Text = "";
-                btnFinalizarVenta.Enabled = false;
-            }
-        }
-
-
-
-        private void ActualizarTablaYTotal()
-        {
-            // Crea una lista anónima solo con lo necesario
-            var datosParaMostrar = productosAgregados.Select(p => new
-            {
-                p.Nombre,
-                p.PrecioVentaUnitario
-            }).ToList();
-
-            dataGridVenta.DataSource = null;
-            dataGridVenta.DataSource = datosParaMostrar;
-
-            // Calcular el total
-            decimal total = productosAgregados.Sum(p => p.PrecioVentaUnitario);
-            labelTotal.Text = total.ToString("C"); // "C" muestra como moneda, ej. $123.00
-
-            // Mostrar número de productos
-            labelNumProductos.Text = productosAgregados.Count.ToString();
-        }
-
         private void ConfigurarGridVenta()
         {
-            dataGridVenta.AllowUserToAddRows = false;    // Evita que el usuario agregue filas manualmente
-
+            dataGridVenta.AllowUserToAddRows = false;
             dataGridVenta.Columns.Clear();
 
             dataGridVenta.Columns.Add("Nombre", "Producto");
-            dataGridVenta.Columns.Add("Precio", "Precio");
+            dataGridVenta.Columns.Add("PrecioVentaUnitario", "PrecioVentaUnitario");
             dataGridVenta.Columns.Add("Cantidad", "Cantidad");
             dataGridVenta.Columns.Add("Subtotal", "Subtotal");
 
-            dataGridVenta.Columns["Nombre"].Width = 510;
+            dataGridVenta.Columns["Nombre"].ReadOnly = true;
+            dataGridVenta.Columns["PrecioVentaUnitario"].ReadOnly = true;
+            dataGridVenta.Columns["Subtotal"].ReadOnly = true;
 
-            // Botón para eliminar
             var btnEliminar = new DataGridViewButtonColumn
             {
                 HeaderText = "Acción",
                 Name = "Eliminar",
                 Text = "Quitar",
                 UseColumnTextForButtonValue = true,
-                FlatStyle = FlatStyle.Flat // Mejora la apariencia
+                FlatStyle = FlatStyle.Flat
             };
 
-            // Estilo: fondo rojo y texto blanco
             btnEliminar.DefaultCellStyle.BackColor = Color.Red;
             btnEliminar.DefaultCellStyle.ForeColor = Color.White;
             dataGridVenta.Columns.Add(btnEliminar);
+
+            dataGridVenta.CellEndEdit += dataGridVenta_CellEndEdit;
         }
 
-
-
-        private void dataGridVenta_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void dataGridVenta_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && dataGridVenta.Columns[e.ColumnIndex].Name == "Eliminar")
+            if (e.ColumnIndex == dataGridVenta.Columns["Cantidad"].Index && e.RowIndex >= 0)
             {
                 var fila = dataGridVenta.Rows[e.RowIndex];
-
-                int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
-                decimal precioUnitario = Convert.ToDecimal(fila.Cells["Precio"].Value);
-
-                if (cantidadActual > 1)
+                if (int.TryParse(fila.Cells["Cantidad"].Value?.ToString(), out int cantidad) && cantidad > 0)
                 {
-                    cantidadActual--;
-                    fila.Cells["Cantidad"].Value = cantidadActual;
-                    fila.Cells["Subtotal"].Value = cantidadActual * precioUnitario;
+                    decimal precio = Convert.ToDecimal(fila.Cells["PrecioVentaUnitario"].Value);
+                    fila.Cells["Subtotal"].Value = (cantidad * precio).ToString("0.00");
                 }
                 else
                 {
-                    dataGridVenta.Rows.RemoveAt(e.RowIndex);
+                    fila.Cells["Cantidad"].Value = 1;
+                    decimal precio = Convert.ToDecimal(fila.Cells["PrecioVentaUnitario"].Value);
+                    fila.Cells["Subtotal"].Value = precio.ToString("0.00");
                 }
 
                 RecalcularTotal();
-                ActualizarCantidadProductos();  // <--- actualizar aquí
+                ActualizarCantidadProductos();
             }
         }
-
 
         private void RecalcularTotal()
         {
             decimal total = 0;
-
             foreach (DataGridViewRow row in dataGridVenta.Rows)
             {
                 if (row.Cells["Subtotal"].Value != null)
@@ -258,7 +195,6 @@ namespace PuntoVenta
                     total += Convert.ToDecimal(row.Cells["Subtotal"].Value);
                 }
             }
-
             labelTotal.Text = total.ToString("C");
         }
 
@@ -375,7 +311,6 @@ namespace PuntoVenta
         }
 
 
-
         private void LimpiarFormularioVenta()
         {
             dataGridVenta.Rows.Clear();
@@ -400,6 +335,11 @@ namespace PuntoVenta
         }
 
         private void textNumTicket_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridVenta_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
         }

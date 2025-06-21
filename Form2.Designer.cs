@@ -57,10 +57,9 @@
             labelTicket.Location = new Point(34, 131);
             labelTicket.Margin = new Padding(5, 0, 5, 0);
             labelTicket.Name = "labelTicket";
-            labelTicket.Size = new Size(111, 37);
+            labelTicket.Size = new Size(89, 30);
             labelTicket.TabIndex = 0;
             labelTicket.Text = "Ticket:";
-            labelTicket.Click += label1_Click;
             // 
             // textNumTicket
             // 
@@ -69,7 +68,7 @@
             textNumTicket.Margin = new Padding(5, 6, 5, 6);
             textNumTicket.Name = "textNumTicket";
             textNumTicket.ReadOnly = true;
-            textNumTicket.Size = new Size(603, 38);
+            textNumTicket.Size = new Size(603, 32);
             textNumTicket.TabIndex = 1;
             textNumTicket.TabStop = false;
             textNumTicket.TextChanged += textNumTicket_TextChanged;
@@ -81,9 +80,8 @@
             textCodigoBarras.Margin = new Padding(5, 6, 5, 6);
             textCodigoBarras.Name = "textCodigoBarras";
             textCodigoBarras.PlaceholderText = "Codigo de barras";
-            textCodigoBarras.Size = new Size(603, 38);
+            textCodigoBarras.Size = new Size(603, 32);
             textCodigoBarras.TabIndex = 0;
-            textCodigoBarras.TextChanged += textCodigoBarras_TextChanged;
             textCodigoBarras.KeyDown += textCodigoBarras_KeyDown;
             // 
             // dataGridVenta
@@ -96,6 +94,8 @@
             dataGridVenta.RowHeadersWidth = 51;
             dataGridVenta.Size = new Size(1152, 980);
             dataGridVenta.TabIndex = 3;
+            dataGridVenta.TabStop = false;
+            dataGridVenta.CellContentClick += dataGridVenta_CellContentClick;
             // 
             // labelFechaHora
             // 
@@ -105,44 +105,43 @@
             labelFechaHora.Location = new Point(34, 17);
             labelFechaHora.Margin = new Padding(5, 0, 5, 0);
             labelFechaHora.Name = "labelFechaHora";
-            labelFechaHora.Size = new Size(279, 67);
+            labelFechaHora.Size = new Size(224, 54);
             labelFechaHora.TabIndex = 0;
             labelFechaHora.Text = "FechaHora";
-            labelFechaHora.Click += label1_Click_1;
             // 
             // labelInfoTotal
             // 
             labelInfoTotal.AutoSize = true;
             labelInfoTotal.Font = new Font("Microsoft Sans Serif", 19F);
-            labelInfoTotal.Location = new Point(34, 559);
+            labelInfoTotal.Location = new Point(93, 449);
             labelInfoTotal.Margin = new Padding(5, 0, 5, 0);
             labelInfoTotal.Name = "labelInfoTotal";
-            labelInfoTotal.Size = new Size(98, 37);
+            labelInfoTotal.Size = new Size(77, 30);
             labelInfoTotal.TabIndex = 0;
             labelInfoTotal.Text = "Total:";
             // 
             // labelTotal
             // 
             labelTotal.AutoSize = true;
-            labelTotal.BackColor = Color.WhiteSmoke;
-            labelTotal.Font = new Font("Segoe UI", 75F, FontStyle.Bold);
+            labelTotal.BackColor = Color.FromArgb(255, 255, 238);
+            labelTotal.Font = new Font("Segoe UI", 85F, FontStyle.Bold);
             labelTotal.ForeColor = Color.Green;
-            labelTotal.Location = new Point(101, 596);
+            labelTotal.Location = new Point(176, 416);
             labelTotal.Margin = new Padding(5, 0, 5, 0);
             labelTotal.Name = "labelTotal";
-            labelTotal.Size = new Size(536, 166);
+            labelTotal.Size = new Size(491, 152);
             labelTotal.TabIndex = 0;
             labelTotal.Text = "0000.00";
-            labelTotal.Click += label2_Click;
+            labelTotal.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // labelInfoCantidadProductos
             // 
             labelInfoCantidadProductos.AutoSize = true;
             labelInfoCantidadProductos.Font = new Font("Microsoft Sans Serif", 19F);
-            labelInfoCantidadProductos.Location = new Point(383, 400);
+            labelInfoCantidadProductos.Location = new Point(412, 283);
             labelInfoCantidadProductos.Margin = new Padding(5, 0, 5, 0);
             labelInfoCantidadProductos.Name = "labelInfoCantidadProductos";
-            labelInfoCantidadProductos.Size = new Size(215, 37);
+            labelInfoCantidadProductos.Size = new Size(171, 30);
             labelInfoCantidadProductos.TabIndex = 0;
             labelInfoCantidadProductos.Text = "N° Productos:";
             labelInfoCantidadProductos.Click += labelInfoCantidadProductos_Click;
@@ -156,12 +155,11 @@
             // textSuPago
             // 
             textSuPago.Font = new Font("Microsoft Sans Serif", 16.2F);
-            textSuPago.Location = new Point(218, 339);
+            textSuPago.Location = new Point(176, 340);
             textSuPago.Margin = new Padding(5, 6, 5, 6);
             textSuPago.Name = "textSuPago";
-            textSuPago.Size = new Size(419, 38);
+            textSuPago.Size = new Size(184, 32);
             textSuPago.TabIndex = 2;
-            textSuPago.TextChanged += textSuPago_TextChanged;
             // 
             // labelPago
             // 
@@ -170,7 +168,7 @@
             labelPago.Location = new Point(34, 340);
             labelPago.Margin = new Padding(5, 0, 5, 0);
             labelPago.Name = "labelPago";
-            labelPago.Size = new Size(146, 37);
+            labelPago.Size = new Size(114, 30);
             labelPago.TabIndex = 0;
             labelPago.Text = "Su pago:";
             // 
@@ -178,10 +176,10 @@
             // 
             labelCambio.AutoSize = true;
             labelCambio.Font = new Font("Microsoft Sans Serif", 19F);
-            labelCambio.Location = new Point(34, 400);
+            labelCambio.Location = new Point(29, 594);
             labelCambio.Margin = new Padding(5, 0, 5, 0);
             labelCambio.Name = "labelCambio";
-            labelCambio.Size = new Size(178, 37);
+            labelCambio.Size = new Size(141, 30);
             labelCambio.TabIndex = 0;
             labelCambio.Text = "Su cambio:";
             // 
@@ -192,7 +190,7 @@
             labelTipoPago.Location = new Point(34, 283);
             labelTipoPago.Margin = new Padding(5, 0, 5, 0);
             labelTipoPago.Name = "labelTipoPago";
-            labelTipoPago.Size = new Size(173, 37);
+            labelTipoPago.Size = new Size(136, 30);
             labelTipoPago.TabIndex = 0;
             labelTipoPago.Text = "Tipo Pago:";
             // 
@@ -200,10 +198,10 @@
             // 
             comboBoxTipoPago.Font = new Font("Microsoft Sans Serif", 16.2F);
             comboBoxTipoPago.FormattingEnabled = true;
-            comboBoxTipoPago.Location = new Point(218, 283);
+            comboBoxTipoPago.Location = new Point(176, 284);
             comboBoxTipoPago.Margin = new Padding(5, 6, 5, 6);
             comboBoxTipoPago.Name = "comboBoxTipoPago";
-            comboBoxTipoPago.Size = new Size(419, 39);
+            comboBoxTipoPago.Size = new Size(184, 34);
             comboBoxTipoPago.TabIndex = 1;
             comboBoxTipoPago.SelectedIndexChanged += comboBoxTipoPago_SelectedIndexChanged;
             // 
@@ -224,15 +222,16 @@
             // labelSuCambio
             // 
             labelSuCambio.AutoSize = true;
-            labelSuCambio.BackColor = Color.FromArgb(255, 255, 192);
-            labelSuCambio.Font = new Font("Microsoft Sans Serif", 17F, FontStyle.Bold);
+            labelSuCambio.BackColor = Color.FromArgb(255, 255, 238);
+            labelSuCambio.Font = new Font("Microsoft Sans Serif", 38F, FontStyle.Bold);
             labelSuCambio.ForeColor = Color.Blue;
-            labelSuCambio.Location = new Point(218, 403);
+            labelSuCambio.Location = new Point(176, 594);
             labelSuCambio.Margin = new Padding(5, 0, 5, 0);
             labelSuCambio.Name = "labelSuCambio";
-            labelSuCambio.Size = new Size(126, 33);
+            labelSuCambio.Size = new Size(214, 59);
             labelSuCambio.TabIndex = 13;
             labelSuCambio.Text = "0000.00";
+            labelSuCambio.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // labelNumProductos
             // 
@@ -240,10 +239,10 @@
             labelNumProductos.BackColor = SystemColors.ButtonHighlight;
             labelNumProductos.Font = new Font("Microsoft Sans Serif", 17F);
             labelNumProductos.ForeColor = Color.MidnightBlue;
-            labelNumProductos.Location = new Point(590, 403);
+            labelNumProductos.Location = new Point(598, 284);
             labelNumProductos.Margin = new Padding(5, 0, 5, 0);
             labelNumProductos.Name = "labelNumProductos";
-            labelNumProductos.Size = new Size(47, 33);
+            labelNumProductos.Size = new Size(39, 29);
             labelNumProductos.TabIndex = 14;
             labelNumProductos.Text = "00";
             labelNumProductos.Click += labelNumProductos_Click;
@@ -264,7 +263,7 @@
             // 
             // FormVenta
             // 
-            AutoScaleDimensions = new SizeF(15F, 29F);
+            AutoScaleDimensions = new SizeF(12F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1924, 1017);
             Controls.Add(buttonCancelarVenta);
