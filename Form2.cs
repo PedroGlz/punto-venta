@@ -140,7 +140,7 @@ namespace PuntoVenta
                         decimal precio = aplicarMayoreo ? producto.PrecioVentaMayoreo : producto.PrecioVentaUnitario;
 
                         fila.Cells["Cantidad"].Value = cantidadActual;
-                        fila.Cells["PrecioVentaUnitario"].Value = precio.ToString("0.00");
+                        fila.Cells["Precio"].Value = precio.ToString("0.00");
                         fila.Cells["Subtotal"].Value = (precio * cantidadActual).ToString("0.00");
                     //}                    
 
@@ -172,13 +172,17 @@ namespace PuntoVenta
             dataGridVenta.Columns.Clear();
 
             dataGridVenta.Columns.Add("Nombre", "Producto");
-            dataGridVenta.Columns.Add("PrecioVentaUnitario", "PrecioVentaUnitario");
+            dataGridVenta.Columns.Add("Precio", "Precio");
             dataGridVenta.Columns.Add("Cantidad", "Cantidad");
             dataGridVenta.Columns.Add("Subtotal", "Subtotal");
 
+            dataGridVenta.Columns["Nombre"].Width = 510;
+
             dataGridVenta.Columns["Nombre"].ReadOnly = true;
-            dataGridVenta.Columns["PrecioVentaUnitario"].ReadOnly = true;
+            dataGridVenta.Columns["Precio"].ReadOnly = true;
             dataGridVenta.Columns["Subtotal"].ReadOnly = true;
+
+
 
             var btnEliminar = new DataGridViewButtonColumn
             {
@@ -226,7 +230,7 @@ namespace PuntoVenta
                     : producto.PrecioVentaUnitario;
 
                 // Asignar precio y subtotal
-                fila.Cells["PrecioVentaUnitario"].Value = precioUnitario.ToString("0.00");
+                fila.Cells["Precio"].Value = precioUnitario.ToString("0.00");
                 fila.Cells["Subtotal"].Value = (cantidad * precioUnitario).ToString("0.00");
 
                 RecalcularTotal();
@@ -427,7 +431,7 @@ namespace PuntoVenta
                     ? producto.PrecioVentaMayoreo
                     : producto.PrecioVentaUnitario;
 
-                fila.Cells["PrecioVentaUnitario"].Value = precio.ToString("0.00");
+                fila.Cells["Precio"].Value = precio.ToString("0.00");
                 fila.Cells["Subtotal"].Value = (precio * nuevaCantidad).ToString("0.00");
 
                 RecalcularTotal();
@@ -458,7 +462,7 @@ namespace PuntoVenta
                         ? producto.PrecioVentaMayoreo
                         : producto.PrecioVentaUnitario;
 
-                    fila.Cells["PrecioVentaUnitario"].Value = nuevoPrecio.ToString("0.00");
+                    fila.Cells["Precio"].Value = nuevoPrecio.ToString("0.00");
                     fila.Cells["Subtotal"].Value = (nuevoPrecio * cantidadActual).ToString("0.00");
                 }
                 else
