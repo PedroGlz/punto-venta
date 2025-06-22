@@ -54,6 +54,9 @@ namespace PuntoVenta
         private void FormVenta_Load(object sender, EventArgs e)
         {
             ConfigurarGridVenta();
+            dataGridVenta.CellValueChanged += dataGridVenta_CellValueChanged;
+            dataGridVenta.CellEndEdit += dataGridVenta_CellEndEdit;
+            dataGridVenta.CellClick += dataGridVenta_CellClick;
         }
 
         private void FormVenta_Shown(object sender, EventArgs e)
@@ -114,11 +117,32 @@ namespace PuntoVenta
                 if (fila.Cells["Nombre"].Value?.ToString() == producto.Nombre)
                 {
                     int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
-                    cantidadActual++;
-                    fila.Cells["Cantidad"].Value = cantidadActual;
 
-                    decimal precioVentaUnitario = Convert.ToDecimal(fila.Cells["PrecioVentaUnitario"].Value);
-                    fila.Cells["Subtotal"].Value = (precioVentaUnitario * cantidadActual).ToString("0.00");
+                    /* // ¿Ya se alcanzó el límite de mayoreo?
+                    if (cantidadActual >= producto.CantidadMinimaMayoreo)
+                    {
+                        // ✅ Agregar nueva fila con precio unitario normal
+                        decimal precioUnitario = producto.PrecioVentaUnitario;
+                        dataGridVenta.Rows.Add(
+                            producto.Nombre,
+                            precioUnitario.ToString("0.00"),
+                            1,
+                            precioUnitario.ToString("0.00")
+                        );
+                    }                    
+                    else
+                    {*/
+                        // ✅ Aumentar cantidad actual en la misma fila
+                        cantidadActual++;
+
+                        // Verificar si ya se activa mayoreo
+                        bool aplicarMayoreo = cantidadActual >= producto.CantidadMinimaMayoreo;
+                        decimal precio = aplicarMayoreo ? producto.PrecioVentaMayoreo : producto.PrecioVentaUnitario;
+
+                        fila.Cells["Cantidad"].Value = cantidadActual;
+                        fila.Cells["PrecioVentaUnitario"].Value = precio.ToString("0.00");
+                        fila.Cells["Subtotal"].Value = (precio * cantidadActual).ToString("0.00");
+                    //}                    
 
                     RecalcularTotal();
                     ActualizarCantidadProductos();
@@ -126,12 +150,21 @@ namespace PuntoVenta
                 }
             }
 
-            decimal precio = producto.PrecioVentaUnitario;
-            dataGridVenta.Rows.Add(producto.Nombre, precio.ToString("0.00"), 1, precio.ToString("0.00"));
+            // Si el producto no está en ninguna fila, se agrega por primera vez
+            decimal precioInicial = producto.CantidadMinimaMayoreo <= 1 ? producto.PrecioVentaMayoreo : producto.PrecioVentaUnitario;
+
+            dataGridVenta.Rows.Add(
+                producto.Nombre,
+                precioInicial.ToString("0.00"),
+                1,
+                precioInicial.ToString("0.00")
+            );
 
             RecalcularTotal();
             ActualizarCantidadProductos();
         }
+
+
 
         private void ConfigurarGridVenta()
         {
@@ -168,22 +201,39 @@ namespace PuntoVenta
             if (e.ColumnIndex == dataGridVenta.Columns["Cantidad"].Index && e.RowIndex >= 0)
             {
                 var fila = dataGridVenta.Rows[e.RowIndex];
-                if (int.TryParse(fila.Cells["Cantidad"].Value?.ToString(), out int cantidad) && cantidad > 0)
+                string nombreProducto = fila.Cells["Nombre"].Value?.ToString();
+                var producto = dbContext.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
+                if (producto == null) return;
+
+                // Validar cantidad
+                if (!int.TryParse(fila.Cells["Cantidad"].Value?.ToString(), out int cantidad) || cantidad <= 0)
                 {
-                    decimal precio = Convert.ToDecimal(fila.Cells["PrecioVentaUnitario"].Value);
-                    fila.Cells["Subtotal"].Value = (cantidad * precio).ToString("0.00");
+                    cantidad = 1;
+                    fila.Cells["Cantidad"].Value = cantidad;
                 }
-                else
+
+                /* // Limitar la cantidad máxima si aplica
+                if (cantidad > producto.CantidadMinimaMayoreo)
                 {
-                    fila.Cells["Cantidad"].Value = 1;
-                    decimal precio = Convert.ToDecimal(fila.Cells["PrecioVentaUnitario"].Value);
-                    fila.Cells["Subtotal"].Value = precio.ToString("0.00");
-                }
+                    MessageBox.Show($"La cantidad no puede ser mayor a {producto.CantidadMinimaMayoreo} (límite de mayoreo).");
+                    cantidad = producto.CantidadMinimaMayoreo;
+                    fila.Cells["Cantidad"].Value = cantidad;
+                }*/
+
+                // Seleccionar el precio correcto
+                decimal precioUnitario = cantidad >= producto.CantidadMinimaMayoreo
+                    ? producto.PrecioVentaMayoreo
+                    : producto.PrecioVentaUnitario;
+
+                // Asignar precio y subtotal
+                fila.Cells["PrecioVentaUnitario"].Value = precioUnitario.ToString("0.00");
+                fila.Cells["Subtotal"].Value = (cantidad * precioUnitario).ToString("0.00");
 
                 RecalcularTotal();
                 ActualizarCantidadProductos();
             }
         }
+
 
         private void RecalcularTotal()
         {
@@ -343,5 +393,90 @@ namespace PuntoVenta
         {
 
         }
+
+        private void dataGridVenta_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+
+            var grid = sender as DataGridView;
+            var fila = grid.Rows[e.RowIndex];
+
+            if (dataGridVenta.Columns[e.ColumnIndex].Name == "Cantidad")
+            {
+                string nombreProducto = fila.Cells["Nombre"].Value?.ToString();
+                var producto = dbContext.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
+                if (producto == null) return;
+
+                if (!int.TryParse(fila.Cells["Cantidad"].Value?.ToString(), out int nuevaCantidad) || nuevaCantidad <= 0)
+                {
+                    fila.Cells["Cantidad"].Value = 1;
+                    nuevaCantidad = 1;
+                }
+
+                /* // Limitar cantidad máxima
+                if (nuevaCantidad > producto.CantidadMinimaMayoreo)
+                {
+                    MessageBox.Show($"La cantidad no puede superar el límite de mayoreo: {producto.CantidadMinimaMayoreo}");
+                    nuevaCantidad = producto.CantidadMinimaMayoreo;
+                    fila.Cells["Cantidad"].Value = nuevaCantidad;
+                }*/
+
+                // Aplicar precio según si es mayoreo
+                decimal precio = nuevaCantidad >= producto.CantidadMinimaMayoreo
+                    ? producto.PrecioVentaMayoreo
+                    : producto.PrecioVentaUnitario;
+
+                fila.Cells["PrecioVentaUnitario"].Value = precio.ToString("0.00");
+                fila.Cells["Subtotal"].Value = (precio * nuevaCantidad).ToString("0.00");
+
+                RecalcularTotal();
+                ActualizarCantidadProductos();
+            }
+        }
+
+
+        private void dataGridVenta_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && dataGridVenta.Columns[e.ColumnIndex].Name == "Eliminar")
+            {
+                var fila = dataGridVenta.Rows[e.RowIndex];
+                string nombreProducto = fila.Cells["Nombre"].Value?.ToString();
+                var producto = dbContext.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
+
+                if (producto == null) return;
+
+                int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
+
+                if (cantidadActual > 1)
+                {
+                    cantidadActual--;
+                    fila.Cells["Cantidad"].Value = cantidadActual;
+
+                    // Validar precio
+                    decimal nuevoPrecio = cantidadActual >= producto.CantidadMinimaMayoreo
+                        ? producto.PrecioVentaMayoreo
+                        : producto.PrecioVentaUnitario;
+
+                    fila.Cells["PrecioVentaUnitario"].Value = nuevoPrecio.ToString("0.00");
+                    fila.Cells["Subtotal"].Value = (nuevoPrecio * cantidadActual).ToString("0.00");
+                }
+                else
+                {
+                    dataGridVenta.Rows.RemoveAt(e.RowIndex);
+                }
+
+                RecalcularTotal();
+                ActualizarCantidadProductos();
+            }
+        }
+
+
+
+
+
+
+
+
     }
 }
