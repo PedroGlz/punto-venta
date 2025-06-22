@@ -132,16 +132,16 @@ namespace PuntoVenta
                     }                    
                     else
                     {*/
-                        // ✅ Aumentar cantidad actual en la misma fila
-                        cantidadActual++;
+                    // ✅ Aumentar cantidad actual en la misma fila
+                    cantidadActual++;
 
-                        // Verificar si ya se activa mayoreo
-                        bool aplicarMayoreo = cantidadActual >= producto.CantidadMinimaMayoreo;
-                        decimal precio = aplicarMayoreo ? producto.PrecioVentaMayoreo : producto.PrecioVentaUnitario;
+                    // Verificar si ya se activa mayoreo
+                    bool aplicarMayoreo = cantidadActual >= producto.CantidadMinimaMayoreo;
+                    decimal precio = aplicarMayoreo ? producto.PrecioVentaMayoreo : producto.PrecioVentaUnitario;
 
-                        fila.Cells["Cantidad"].Value = cantidadActual;
-                        fila.Cells["Precio"].Value = precio.ToString("0.00");
-                        fila.Cells["Subtotal"].Value = (precio * cantidadActual).ToString("0.00");
+                    fila.Cells["Cantidad"].Value = cantidadActual;
+                    fila.Cells["Precio"].Value = precio.ToString("0.00");
+                    fila.Cells["Subtotal"].Value = (precio * cantidadActual).ToString("0.00");
                     //}                    
 
                     RecalcularTotal();
@@ -475,11 +475,35 @@ namespace PuntoVenta
             }
         }
 
+        private void textSuPago_TextChanged(object sender, EventArgs e)
+        {
+            CalcularCambio();
+        }
 
+        private void CalcularCambio()
+        {
+            if (decimal.TryParse(textSuPago.Text, out decimal pago))
+            {
+                // Recalcular el total desde el DataGridView
+                decimal total = 0;
+                foreach (DataGridViewRow row in dataGridVenta.Rows)
+                {
+                    if (row.Cells["Subtotal"].Value != null)
+                    {
+                        total += Convert.ToDecimal(row.Cells["Subtotal"].Value);
+                    }
+                }
 
-
-
-
+                decimal cambio = pago - total;
+                labelSuCambio.Text = cambio >= 0 ? cambio.ToString("C") : "$0.00";
+                btnFinalizarVenta.Enabled = cambio >= 0;
+            }
+            else
+            {
+                labelSuCambio.Text = "$0.00";
+                btnFinalizarVenta.Enabled = false;
+            }
+        }
 
 
     }

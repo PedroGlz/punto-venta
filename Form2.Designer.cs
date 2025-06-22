@@ -160,6 +160,7 @@
             textSuPago.Name = "textSuPago";
             textSuPago.Size = new Size(184, 32);
             textSuPago.TabIndex = 2;
+            textSuPago.TextChanged += textSuPago_TextChanged;
             // 
             // labelPago
             // 
