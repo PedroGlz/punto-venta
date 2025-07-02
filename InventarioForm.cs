@@ -41,6 +41,7 @@ namespace PuntoVenta
                 {
                     Gtin = textGtin.Text,
                     Nombre = textNombre.Text,
+                    aGranel = checkAgranel.Checked,
                     PrecioCompra = decimal.Parse(txtPrecioCompra.Text),
                     PrecioVentaUnitario = decimal.Parse(textPrecioVentaUnitario.Text),
                     UtilidadUnitaria = decimal.Parse(textUtilidadUnitaria.Text),
@@ -148,6 +149,7 @@ namespace PuntoVenta
         {
             textGtin.Text = "";
             textNombre.Text = "";
+            checkAgranel.Checked = false;
             txtPrecioCompra.Text = "";
             textPrecioVentaUnitario.Text = "";
             textUtilidadUnitaria.Text = "";
@@ -168,6 +170,7 @@ namespace PuntoVenta
 
                 textGtin.Text = fila.Cells["Gtin"].Value.ToString();
                 textNombre.Text = fila.Cells["Nombre"].Value.ToString();
+                checkAgranel.Checked = (bool)fila.Cells["aGranel"].Value;
                 txtPrecioCompra.Text = fila.Cells["PrecioCompra"].Value.ToString();
                 textPrecioVentaUnitario.Text = fila.Cells["PrecioVentaUnitario"].Value.ToString();
                 textUtilidadUnitaria.Text = fila.Cells["UtilidadUnitaria"].Value.ToString();
@@ -209,6 +212,7 @@ namespace PuntoVenta
 
             producto.Gtin = textGtin.Text;
             producto.Nombre = textNombre.Text;
+            producto.aGranel = checkAgranel.Checked;
             producto.PrecioCompra = decimal.Parse(txtPrecioCompra.Text);
             producto.PrecioVentaUnitario = decimal.Parse(textPrecioVentaUnitario.Text);
             producto.UtilidadUnitaria = decimal.Parse(textUtilidadUnitaria.Text);
@@ -336,6 +340,11 @@ namespace PuntoVenta
         {
             textBuscar.Text = "";
             CargarProductos();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -82,6 +82,29 @@ namespace PuntoVenta
             var producto = db.Productos.FirstOrDefault(p => p.Gtin == entrada);
             if (producto != null)
             {
+                if (producto.aGranel)
+                {
+                    using var formAgranel = new FormAgranel(producto.Nombre, producto.PrecioVentaUnitario);
+                    if (formAgranel.ShowDialog() == DialogResult.OK)
+                    {
+                        decimal cantidad = formAgranel.Cantidad;
+                        decimal precioUnitario = formAgranel.PrecioUnitario;
+                        decimal subtotal = cantidad * precioUnitario;
+
+                        dataGridVenta.Rows.Add(
+                            producto.Nombre,
+                            precioUnitario.ToString("0.00"),
+                            cantidad.ToString("0.###"),
+                            subtotal.ToString("0.00")
+                        );
+
+                        RecalcularTotal();
+                        ActualizarCantidadProductos();
+                    }
+
+                    return;
+                }
+
                 AgregarProductoAlGrid(producto);
                 return;
             }
@@ -98,17 +121,68 @@ namespace PuntoVenta
 
             if (productosEncontrados.Count == 1)
             {
-                AgregarProductoAlGrid(productosEncontrados[0]);
+                var p = productosEncontrados[0];
+
+                if (p.aGranel)
+                {
+                    using var formAgranel = new FormAgranel(p.Nombre, p.PrecioVentaUnitario);
+                    if (formAgranel.ShowDialog() == DialogResult.OK)
+                    {
+                        decimal cantidad = formAgranel.Cantidad;
+                        decimal precioUnitario = formAgranel.PrecioUnitario;
+                        decimal subtotal = cantidad * precioUnitario;
+
+                        dataGridVenta.Rows.Add(
+                            p.Nombre,
+                            precioUnitario.ToString("0.00"),
+                            cantidad.ToString("0.###"),
+                            subtotal.ToString("0.00")
+                        );
+
+                        RecalcularTotal();
+                        ActualizarCantidadProductos();
+                    }
+
+                    return;
+                }
+
+                AgregarProductoAlGrid(p);
             }
             else
             {
                 using var formSeleccion = new FormSeleccionProducto(productosEncontrados);
                 if (formSeleccion.ShowDialog() == DialogResult.OK && formSeleccion.ProductoSeleccionado != null)
                 {
-                    AgregarProductoAlGrid(formSeleccion.ProductoSeleccionado);
+                    var p = formSeleccion.ProductoSeleccionado;
+
+                    if (p.aGranel)
+                    {
+                        using var formAgranel = new FormAgranel(p.Nombre, p.PrecioVentaUnitario);
+                        if (formAgranel.ShowDialog() == DialogResult.OK)
+                        {
+                            decimal cantidad = formAgranel.Cantidad;
+                            decimal precioUnitario = formAgranel.PrecioUnitario;
+                            decimal subtotal = cantidad * precioUnitario;
+
+                            dataGridVenta.Rows.Add(
+                                p.Nombre,
+                                precioUnitario.ToString("0.00"),
+                                cantidad.ToString("0.###"),
+                                subtotal.ToString("0.00")
+                            );
+
+                            RecalcularTotal();
+                            ActualizarCantidadProductos();
+                        }
+                    }
+                    else
+                    {
+                        AgregarProductoAlGrid(p);
+                    }
                 }
             }
         }
+
 
         private void AgregarProductoAlGrid(Producto producto)
         {

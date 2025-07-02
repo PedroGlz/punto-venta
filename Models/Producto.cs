@@ -11,6 +11,7 @@ namespace PuntoVenta.Models
         public int ProductoId { get; set; }
         public string Gtin { get; set; }
         public string Nombre { get; set; }
+        public bool aGranel { get; set; } = false;
         public decimal PrecioCompra { get; set; }
         public decimal PrecioVentaUnitario { get; set; }
         public decimal UtilidadUnitaria { get; set; }

@@ -56,6 +56,7 @@
             textUtilidadMayoreo = new TextBox();
             label1 = new Label();
             textCantMinMayoreo = new TextBox();
+            checkAgranel = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)tablaProductos).BeginInit();
             SuspendLayout();
             // 
@@ -63,11 +64,10 @@
             // 
             tablaProductos.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tablaProductos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            tablaProductos.Location = new Point(14, 192);
-            tablaProductos.Margin = new Padding(3, 4, 3, 4);
+            tablaProductos.Location = new Point(12, 144);
             tablaProductos.Name = "tablaProductos";
             tablaProductos.RowHeadersWidth = 51;
-            tablaProductos.Size = new Size(1540, 392);
+            tablaProductos.Size = new Size(1386, 294);
             tablaProductos.TabIndex = 8;
             tablaProductos.TabStop = false;
             tablaProductos.CellContentClick += tablaProductos_CellContentClick;
@@ -76,37 +76,33 @@
             // 
             // textNombre
             // 
-            textNombre.Location = new Point(253, 57);
-            textNombre.Margin = new Padding(3, 4, 3, 4);
+            textNombre.Location = new Point(221, 43);
             textNombre.Name = "textNombre";
-            textNombre.Size = new Size(335, 27);
+            textNombre.Size = new Size(294, 23);
             textNombre.TabIndex = 1;
             // 
             // txtPrecioCompra
             // 
-            txtPrecioCompra.Location = new Point(598, 57);
-            txtPrecioCompra.Margin = new Padding(3, 4, 3, 4);
+            txtPrecioCompra.Location = new Point(591, 43);
             txtPrecioCompra.Name = "txtPrecioCompra";
-            txtPrecioCompra.Size = new Size(101, 27);
+            txtPrecioCompra.Size = new Size(89, 23);
             txtPrecioCompra.TabIndex = 2;
             txtPrecioCompra.TextChanged += txtPrecioCompra_TextChanged;
             // 
             // textCantDisponible
             // 
-            textCantDisponible.Location = new Point(1208, 58);
-            textCantDisponible.Margin = new Padding(3, 4, 3, 4);
+            textCantDisponible.Location = new Point(1125, 44);
             textCantDisponible.Name = "textCantDisponible";
-            textCantDisponible.Size = new Size(114, 27);
+            textCantDisponible.Size = new Size(100, 23);
             textCantDisponible.TabIndex = 6;
             // 
             // btnAgregar
             // 
             btnAgregar.BackColor = Color.FromArgb(0, 64, 0);
             btnAgregar.ForeColor = Color.White;
-            btnAgregar.Location = new Point(1440, 53);
-            btnAgregar.Margin = new Padding(3, 4, 3, 4);
+            btnAgregar.Location = new Point(1319, 40);
             btnAgregar.Name = "btnAgregar";
-            btnAgregar.Size = new Size(94, 39);
+            btnAgregar.Size = new Size(82, 29);
             btnAgregar.TabIndex = 8;
             btnAgregar.Text = "Agregar";
             btnAgregar.UseVisualStyleBackColor = false;
@@ -115,100 +111,96 @@
             // labelNombre
             // 
             labelNombre.AutoSize = true;
-            labelNombre.Location = new Point(253, 33);
+            labelNombre.Location = new Point(221, 25);
             labelNombre.Name = "labelNombre";
-            labelNombre.Size = new Size(67, 20);
+            labelNombre.Size = new Size(54, 15);
             labelNombre.TabIndex = 10;
             labelNombre.Text = "Nombre:";
             // 
             // labelPrecioCompra
             // 
             labelPrecioCompra.AutoSize = true;
-            labelPrecioCompra.Location = new Point(598, 33);
+            labelPrecioCompra.Location = new Point(591, 25);
             labelPrecioCompra.Name = "labelPrecioCompra";
-            labelPrecioCompra.Size = new Size(110, 20);
+            labelPrecioCompra.Size = new Size(89, 15);
             labelPrecioCompra.TabIndex = 11;
             labelPrecioCompra.Text = "Precio Compra:";
             // 
             // labelCantDisponible
             // 
             labelCantDisponible.AutoSize = true;
-            labelCantDisponible.Location = new Point(1208, 34);
+            labelCantDisponible.Location = new Point(1125, 26);
             labelCantDisponible.Name = "labelCantDisponible";
-            labelCantDisponible.Size = new Size(121, 20);
+            labelCantDisponible.Size = new Size(97, 15);
             labelCantDisponible.TabIndex = 14;
             labelCantDisponible.Text = "Cant. Disponible:";
             // 
             // labelCantMin
             // 
             labelCantMin.AutoSize = true;
-            labelCantMin.Location = new Point(1329, 34);
+            labelCantMin.Location = new Point(1231, 26);
             labelCantMin.Name = "labelCantMin";
-            labelCantMin.Size = new Size(99, 20);
+            labelCantMin.Size = new Size(82, 15);
             labelCantMin.TabIndex = 15;
             labelCantMin.Text = "Cant. Minima:";
             // 
             // textCantMin
             // 
-            textCantMin.Location = new Point(1329, 58);
-            textCantMin.Margin = new Padding(3, 4, 3, 4);
+            textCantMin.Location = new Point(1231, 44);
             textCantMin.Name = "textCantMin";
-            textCantMin.Size = new Size(93, 27);
+            textCantMin.Size = new Size(82, 23);
             textCantMin.TabIndex = 7;
             // 
             // labelPrecioVentaUnitario
             // 
             labelPrecioVentaUnitario.AutoSize = true;
-            labelPrecioVentaUnitario.Location = new Point(705, 9);
+            labelPrecioVentaUnitario.Location = new Point(685, 7);
             labelPrecioVentaUnitario.Name = "labelPrecioVentaUnitario";
-            labelPrecioVentaUnitario.Size = new Size(75, 40);
+            labelPrecioVentaUnitario.Size = new Size(60, 30);
             labelPrecioVentaUnitario.TabIndex = 12;
             labelPrecioVentaUnitario.Text = "Precio\r\nVenta Uni:";
             labelPrecioVentaUnitario.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // textPrecioVentaUnitario
             // 
-            textPrecioVentaUnitario.Location = new Point(706, 57);
-            textPrecioVentaUnitario.Margin = new Padding(3, 4, 3, 4);
+            textPrecioVentaUnitario.Location = new Point(686, 43);
             textPrecioVentaUnitario.Name = "textPrecioVentaUnitario";
-            textPrecioVentaUnitario.Size = new Size(85, 27);
+            textPrecioVentaUnitario.Size = new Size(75, 23);
             textPrecioVentaUnitario.TabIndex = 3;
             textPrecioVentaUnitario.TextChanged += textPrecioVentaUnitario_TextChanged;
             // 
             // labelGtin
             // 
             labelGtin.AutoSize = true;
-            labelGtin.Location = new Point(14, 33);
+            labelGtin.Location = new Point(12, 25);
             labelGtin.Name = "labelGtin";
-            labelGtin.Size = new Size(45, 20);
+            labelGtin.Size = new Size(37, 15);
             labelGtin.TabIndex = 9;
             labelGtin.Text = "GTIN:";
             // 
             // textGtin
             // 
-            textGtin.Location = new Point(14, 57);
-            textGtin.Margin = new Padding(3, 4, 3, 4);
+            textGtin.Location = new Point(12, 43);
             textGtin.Name = "textGtin";
-            textGtin.Size = new Size(231, 27);
+            textGtin.Size = new Size(203, 23);
             textGtin.TabIndex = 0;
             textGtin.KeyDown += textGtin_KeyDown;
             // 
             // labelUtilidadUnitaria
             // 
             labelUtilidadUnitaria.AutoSize = true;
-            labelUtilidadUnitaria.Location = new Point(797, 33);
+            labelUtilidadUnitaria.Location = new Point(765, 25);
             labelUtilidadUnitaria.Name = "labelUtilidadUnitaria";
-            labelUtilidadUnitaria.Size = new Size(91, 20);
+            labelUtilidadUnitaria.Size = new Size(72, 15);
             labelUtilidadUnitaria.TabIndex = 13;
             labelUtilidadUnitaria.Text = "Utilidad Uni:";
             // 
             // textUtilidadUnitaria
             // 
-            textUtilidadUnitaria.Location = new Point(797, 57);
-            textUtilidadUnitaria.Margin = new Padding(3, 4, 3, 4);
+            textUtilidadUnitaria.Location = new Point(765, 43);
             textUtilidadUnitaria.Name = "textUtilidadUnitaria";
             textUtilidadUnitaria.ReadOnly = true;
-            textUtilidadUnitaria.Size = new Size(91, 27);
+            textUtilidadUnitaria.Size = new Size(80, 23);
             textUtilidadUnitaria.TabIndex = 0;
             textUtilidadUnitaria.TabStop = false;
             // 
@@ -216,10 +208,9 @@
             // 
             btnGuardarEdicion.BackColor = Color.FromArgb(0, 64, 0);
             btnGuardarEdicion.ForeColor = Color.White;
-            btnGuardarEdicion.Location = new Point(14, 108);
-            btnGuardarEdicion.Margin = new Padding(3, 4, 3, 4);
+            btnGuardarEdicion.Location = new Point(12, 81);
             btnGuardarEdicion.Name = "btnGuardarEdicion";
-            btnGuardarEdicion.Size = new Size(94, 39);
+            btnGuardarEdicion.Size = new Size(82, 29);
             btnGuardarEdicion.TabIndex = 11;
             btnGuardarEdicion.Text = "Guardar";
             btnGuardarEdicion.UseVisualStyleBackColor = false;
@@ -228,10 +219,9 @@
             // 
             // btnCancelarEdicion
             // 
-            btnCancelarEdicion.Location = new Point(114, 108);
-            btnCancelarEdicion.Margin = new Padding(3, 4, 3, 4);
+            btnCancelarEdicion.Location = new Point(100, 81);
             btnCancelarEdicion.Name = "btnCancelarEdicion";
-            btnCancelarEdicion.Size = new Size(94, 39);
+            btnCancelarEdicion.Size = new Size(82, 29);
             btnCancelarEdicion.TabIndex = 12;
             btnCancelarEdicion.Text = "Cancelar";
             btnCancelarEdicion.UseVisualStyleBackColor = true;
@@ -240,19 +230,18 @@
             // 
             // textBuscar
             // 
-            textBuscar.Location = new Point(1119, 153);
-            textBuscar.Margin = new Padding(3, 4, 3, 4);
+            textBuscar.Location = new Point(1038, 115);
             textBuscar.Name = "textBuscar";
-            textBuscar.Size = new Size(343, 27);
+            textBuscar.Size = new Size(301, 23);
             textBuscar.TabIndex = 9;
             textBuscar.TextChanged += textBuscar_TextChanged;
             // 
             // labelBuscar
             // 
             labelBuscar.AutoSize = true;
-            labelBuscar.Location = new Point(889, 156);
+            labelBuscar.Location = new Point(837, 117);
             labelBuscar.Name = "labelBuscar";
-            labelBuscar.Size = new Size(224, 20);
+            labelBuscar.Size = new Size(179, 15);
             labelBuscar.TabIndex = 0;
             labelBuscar.Text = "Buscar (Nombre/Código Barras):";
             // 
@@ -261,17 +250,15 @@
             menuStrip1.ImageScalingSize = new Size(20, 20);
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new Padding(7, 3, 0, 3);
-            menuStrip1.Size = new Size(1573, 24);
+            menuStrip1.Size = new Size(1414, 24);
             menuStrip1.TabIndex = 21;
             menuStrip1.Text = "menuStrip1";
             // 
             // buttonLimpiarBuscar
             // 
-            buttonLimpiarBuscar.Location = new Point(1470, 149);
-            buttonLimpiarBuscar.Margin = new Padding(3, 4, 3, 4);
+            buttonLimpiarBuscar.Location = new Point(1345, 112);
             buttonLimpiarBuscar.Name = "buttonLimpiarBuscar";
-            buttonLimpiarBuscar.Size = new Size(64, 35);
+            buttonLimpiarBuscar.Size = new Size(56, 26);
             buttonLimpiarBuscar.TabIndex = 10;
             buttonLimpiarBuscar.Text = "Borrar";
             buttonLimpiarBuscar.UseVisualStyleBackColor = true;
@@ -280,63 +267,72 @@
             // labelPrecioVentaMsyoreo
             // 
             labelPrecioVentaMsyoreo.AutoSize = true;
-            labelPrecioVentaMsyoreo.Location = new Point(894, 13);
+            labelPrecioVentaMsyoreo.Location = new Point(850, 10);
             labelPrecioVentaMsyoreo.Name = "labelPrecioVentaMsyoreo";
-            labelPrecioVentaMsyoreo.Size = new Size(81, 40);
+            labelPrecioVentaMsyoreo.Size = new Size(65, 30);
             labelPrecioVentaMsyoreo.TabIndex = 24;
             labelPrecioVentaMsyoreo.Text = "Precio\r\nVenta May:";
             labelPrecioVentaMsyoreo.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // textPrecioVentaMayoreo
             // 
-            textPrecioVentaMayoreo.Location = new Point(894, 58);
-            textPrecioVentaMayoreo.Margin = new Padding(3, 4, 3, 4);
+            textPrecioVentaMayoreo.Location = new Point(850, 44);
             textPrecioVentaMayoreo.Name = "textPrecioVentaMayoreo";
-            textPrecioVentaMayoreo.Size = new Size(85, 27);
+            textPrecioVentaMayoreo.Size = new Size(75, 23);
             textPrecioVentaMayoreo.TabIndex = 4;
             textPrecioVentaMayoreo.TextChanged += textPrecioVentaMayoreo_TextChanged;
             // 
             // labelUtilidadMayoreo
             // 
             labelUtilidadMayoreo.AutoSize = true;
-            labelUtilidadMayoreo.Location = new Point(985, 34);
+            labelUtilidadMayoreo.Location = new Point(930, 26);
             labelUtilidadMayoreo.Name = "labelUtilidadMayoreo";
-            labelUtilidadMayoreo.Size = new Size(97, 20);
+            labelUtilidadMayoreo.Size = new Size(77, 15);
             labelUtilidadMayoreo.TabIndex = 26;
             labelUtilidadMayoreo.Text = "Utilidad May:";
             // 
             // textUtilidadMayoreo
             // 
-            textUtilidadMayoreo.Location = new Point(985, 58);
-            textUtilidadMayoreo.Margin = new Padding(3, 4, 3, 4);
+            textUtilidadMayoreo.Location = new Point(930, 44);
             textUtilidadMayoreo.Name = "textUtilidadMayoreo";
             textUtilidadMayoreo.ReadOnly = true;
-            textUtilidadMayoreo.Size = new Size(97, 27);
+            textUtilidadMayoreo.Size = new Size(85, 23);
             textUtilidadMayoreo.TabIndex = 0;
             textUtilidadMayoreo.TabStop = false;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(1088, 13);
+            label1.Location = new Point(1020, 10);
             label1.Name = "label1";
-            label1.Size = new Size(100, 40);
+            label1.Size = new Size(81, 30);
             label1.TabIndex = 28;
             label1.Text = "Cant. \r\nMin Mayoreo:";
             // 
             // textCantMinMayoreo
             // 
-            textCantMinMayoreo.Location = new Point(1088, 58);
-            textCantMinMayoreo.Margin = new Padding(3, 4, 3, 4);
+            textCantMinMayoreo.Location = new Point(1020, 44);
             textCantMinMayoreo.Name = "textCantMinMayoreo";
-            textCantMinMayoreo.Size = new Size(114, 27);
+            textCantMinMayoreo.Size = new Size(100, 23);
             textCantMinMayoreo.TabIndex = 5;
+            // 
+            // checkAgranel
+            // 
+            checkAgranel.AutoSize = true;
+            checkAgranel.Location = new Point(521, 48);
+            checkAgranel.Name = "checkAgranel";
+            checkAgranel.Size = new Size(67, 19);
+            checkAgranel.TabIndex = 29;
+            checkAgranel.Text = "Por Kilo";
+            checkAgranel.UseVisualStyleBackColor = true;
+            checkAgranel.CheckedChanged += checkBox1_CheckedChanged;
             // 
             // InventarioForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1573, 600);
+            ClientSize = new Size(1414, 450);
+            Controls.Add(checkAgranel);
             Controls.Add(label1);
             Controls.Add(textCantMinMayoreo);
             Controls.Add(labelUtilidadMayoreo);
@@ -366,7 +362,6 @@
             Controls.Add(tablaProductos);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
-            Margin = new Padding(3, 4, 3, 4);
             Name = "InventarioForm";
             Text = "Form1";
             Load += Form1_Load;
@@ -407,5 +402,6 @@
         private TextBox textUtilidadMayoreo;
         private Label label1;
         private TextBox textCantMinMayoreo;
+        private CheckBox checkAgranel;
     }
 }
