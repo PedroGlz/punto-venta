@@ -33,7 +33,7 @@
             textGramos = new TextBox();
             label2 = new Label();
             textImporte = new TextBox();
-            btnAceptar = new Button();
+            btnAgregarGranel = new Button();
             btnCancelar = new Button();
             textPrecio = new TextBox();
             label3 = new Label();
@@ -63,7 +63,7 @@
             textGramos.Location = new Point(150, 100);
             textGramos.Name = "textGramos";
             textGramos.Size = new Size(100, 23);
-            textGramos.TabIndex = 2;
+            textGramos.TabIndex = 3;
             textGramos.TextChanged += textGramos_TextChanged;
             // 
             // label2
@@ -80,25 +80,28 @@
             textImporte.Location = new Point(150, 135);
             textImporte.Name = "textImporte";
             textImporte.Size = new Size(100, 23);
-            textImporte.TabIndex = 4;
+            textImporte.TabIndex = 1;
             textImporte.TextChanged += textImporte_TextChanged;
             // 
-            // btnAceptar
+            // btnAgregarGranel
             // 
-            btnAceptar.Location = new Point(30, 183);
-            btnAceptar.Name = "btnAceptar";
-            btnAceptar.Size = new Size(100, 30);
-            btnAceptar.TabIndex = 5;
-            btnAceptar.Text = "Aceptar";
-            btnAceptar.UseVisualStyleBackColor = true;
-            btnAceptar.Click += btnAceptar_Click;
+            btnAgregarGranel.BackColor = Color.FromArgb(192, 192, 255);
+            btnAgregarGranel.Location = new Point(150, 176);
+            btnAgregarGranel.Name = "btnAgregarGranel";
+            btnAgregarGranel.Size = new Size(100, 30);
+            btnAgregarGranel.TabIndex = 2;
+            btnAgregarGranel.Text = "Agregar";
+            btnAgregarGranel.UseVisualStyleBackColor = false;
+            btnAgregarGranel.Click += btnAgregarGranel_Click;
             // 
             // btnCancelar
             // 
-            btnCancelar.Location = new Point(150, 183);
+            btnCancelar.AllowDrop = true;
+            btnCancelar.Location = new Point(24, 176);
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(100, 30);
             btnCancelar.TabIndex = 6;
+            btnCancelar.TabStop = false;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = true;
             btnCancelar.Click += btnCancelar_Click;
@@ -108,7 +111,8 @@
             textPrecio.Location = new Point(150, 66);
             textPrecio.Name = "textPrecio";
             textPrecio.Size = new Size(100, 23);
-            textPrecio.TabIndex = 8;
+            textPrecio.TabIndex = 0;
+            textPrecio.TabStop = false;
             textPrecio.TextChanged += textPrecio_TextChanged;
             // 
             // label3
@@ -129,7 +133,7 @@
             Controls.Add(textPrecio);
             Controls.Add(label3);
             Controls.Add(btnCancelar);
-            Controls.Add(btnAceptar);
+            Controls.Add(btnAgregarGranel);
             Controls.Add(textImporte);
             Controls.Add(label2);
             Controls.Add(textGramos);
@@ -152,7 +156,7 @@
         private System.Windows.Forms.TextBox textGramos;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textImporte;
-        private System.Windows.Forms.Button btnAceptar;
+        private System.Windows.Forms.Button btnAgregarGranel;
         private System.Windows.Forms.Button btnCancelar;
         private TextBox textPrecio;
         private Label label3;

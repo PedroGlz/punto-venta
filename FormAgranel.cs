@@ -24,8 +24,7 @@ namespace PuntoVenta
         {
             InitializeComponent();
             this.precioPorKilo = precioPorKilo;
-            labelProducto.Text = nombreProducto;
-            //labelProducto.Text = $"{producto.Nombre} - ${producto.PrecioVentaUnitario:0.00}";
+            labelProducto.Text = $"{nombreProducto} - ${precioPorKilo:0.00} kg";
             textPrecio.Text = precioPorKilo.ToString("0.00");
             textGramos.Text = gramosDefault.ToString();
             textImporte.Text = ((precioPorKilo / gramosDefault) * gramosDefault).ToString("0.00");
@@ -33,17 +32,12 @@ namespace PuntoVenta
 
         private void radioCantidad_CheckedChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void radioImporte_CheckedChanged(object sender, EventArgs e)
         {
-            
-        }
 
-        private void btnAceptar_Click(object sender, EventArgs e)
-        {
-            
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -99,5 +93,25 @@ namespace PuntoVenta
             }
             actualizando = false;
         }
+
+        private void btnAgregarGranel_Click(object sender, EventArgs e)
+        {
+            if (decimal.TryParse(textGramos.Text, out decimal gramos) &&
+                decimal.TryParse(textPrecio.Text, out decimal precioUnitario) &&
+                gramos > 0 && precioUnitario > 0)
+            {
+                
+                Cantidad = gramos;
+                PrecioUnitario = precioUnitario;
+
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Verifica los valores ingresados. El precio y los gramos deben ser mayores a cero.", "Datos inválidos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
     }
 }

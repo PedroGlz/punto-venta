@@ -95,6 +95,7 @@
             dataGridVenta.Size = new Size(1152, 980);
             dataGridVenta.TabIndex = 3;
             dataGridVenta.TabStop = false;
+            dataGridVenta.CellBeginEdit += dataGridVenta_CellBeginEdit;
             dataGridVenta.CellContentClick += dataGridVenta_CellContentClick;
             // 
             // labelFechaHora

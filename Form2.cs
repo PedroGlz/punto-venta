@@ -87,24 +87,10 @@ namespace PuntoVenta
                     using var formAgranel = new FormAgranel(producto.Nombre, producto.PrecioVentaUnitario);
                     if (formAgranel.ShowDialog() == DialogResult.OK)
                     {
-                        decimal cantidad = formAgranel.Cantidad;
-                        decimal precioUnitario = formAgranel.PrecioUnitario;
-                        decimal subtotal = cantidad * precioUnitario;
-
-                        dataGridVenta.Rows.Add(
-                            producto.Nombre,
-                            precioUnitario.ToString("0.00"),
-                            cantidad.ToString("0.###"),
-                            subtotal.ToString("0.00")
-                        );
-
-                        RecalcularTotal();
-                        ActualizarCantidadProductos();
+                        AgregarProductoGranelAlGrid(producto, formAgranel.Cantidad, formAgranel.PrecioUnitario);
                     }
-
                     return;
                 }
-
                 AgregarProductoAlGrid(producto);
                 return;
             }
@@ -128,24 +114,10 @@ namespace PuntoVenta
                     using var formAgranel = new FormAgranel(p.Nombre, p.PrecioVentaUnitario);
                     if (formAgranel.ShowDialog() == DialogResult.OK)
                     {
-                        decimal cantidad = formAgranel.Cantidad;
-                        decimal precioUnitario = formAgranel.PrecioUnitario;
-                        decimal subtotal = cantidad * precioUnitario;
-
-                        dataGridVenta.Rows.Add(
-                            p.Nombre,
-                            precioUnitario.ToString("0.00"),
-                            cantidad.ToString("0.###"),
-                            subtotal.ToString("0.00")
-                        );
-
-                        RecalcularTotal();
-                        ActualizarCantidadProductos();
+                        AgregarProductoGranelAlGrid(p, formAgranel.Cantidad, formAgranel.PrecioUnitario);
                     }
-
                     return;
                 }
-
                 AgregarProductoAlGrid(p);
             }
             else
@@ -160,19 +132,7 @@ namespace PuntoVenta
                         using var formAgranel = new FormAgranel(p.Nombre, p.PrecioVentaUnitario);
                         if (formAgranel.ShowDialog() == DialogResult.OK)
                         {
-                            decimal cantidad = formAgranel.Cantidad;
-                            decimal precioUnitario = formAgranel.PrecioUnitario;
-                            decimal subtotal = cantidad * precioUnitario;
-
-                            dataGridVenta.Rows.Add(
-                                p.Nombre,
-                                precioUnitario.ToString("0.00"),
-                                cantidad.ToString("0.###"),
-                                subtotal.ToString("0.00")
-                            );
-
-                            RecalcularTotal();
-                            ActualizarCantidadProductos();
+                            AgregarProductoGranelAlGrid(p, formAgranel.Cantidad, formAgranel.PrecioUnitario);
                         }
                     }
                     else
@@ -182,7 +142,6 @@ namespace PuntoVenta
                 }
             }
         }
-
 
         private void AgregarProductoAlGrid(Producto producto)
         {
@@ -231,14 +190,42 @@ namespace PuntoVenta
                 producto.Nombre,
                 precioInicial.ToString("0.00"),
                 1,
-                precioInicial.ToString("0.00")
+                precioInicial.ToString("0.00"),
+                producto.Gtin,
+                producto.aGranel
             );
 
             RecalcularTotal();
             ActualizarCantidadProductos();
         }
 
+        private void AgregarProductoGranelAlGrid(Producto producto, decimal cantidad, decimal precioUnitario)
+        {
+            decimal subtotal = (precioUnitario / 1000) * cantidad;
 
+            string peso = "";
+
+            if (cantidad == 1000)
+            {
+                peso = "1 kg"; // Asegurarse de que sea al menos 1 kg
+            }
+            else
+            {
+                peso = cantidad.ToString() + " g";
+            }
+
+            dataGridVenta.Rows.Add(
+                producto.Nombre,
+                precioUnitario.ToString("0.00"),
+                peso, // mostrar gramos con 3 decimales y concatenar "kg"
+                subtotal.ToString("0.00"),
+                producto.Gtin,
+                producto.aGranel
+            );
+
+            RecalcularTotal();
+            ActualizarCantidadProductos();
+        }
 
         private void ConfigurarGridVenta()
         {
@@ -251,6 +238,12 @@ namespace PuntoVenta
             dataGridVenta.Columns.Add("Subtotal", "Subtotal");
 
             dataGridVenta.Columns["Nombre"].Width = 510;
+
+            // columnas ocultas para productos a granel
+            dataGridVenta.Columns.Add("Gtin", "Código de Barras");
+            dataGridVenta.Columns["Gtin"].Visible = false;
+            dataGridVenta.Columns.Add("aGranel", "aGranel");
+            dataGridVenta.Columns["aGranel"].Visible = false;
 
             dataGridVenta.Columns["Nombre"].ReadOnly = true;
             dataGridVenta.Columns["Precio"].ReadOnly = true;
@@ -329,15 +322,34 @@ namespace PuntoVenta
         private void ActualizarCantidadProductos()
         {
             int totalProductos = 0;
+
             foreach (DataGridViewRow row in dataGridVenta.Rows)
             {
-                if (row.Cells["Cantidad"].Value != null)
+                if (row.Cells["aGranel"].Value == null || row.Cells["Cantidad"].Value == null)
+                    continue;
+
+                bool esGranel = Convert.ToBoolean(row.Cells["aGranel"].Value);
+
+                if (esGranel)
                 {
-                    totalProductos += Convert.ToInt32(row.Cells["Cantidad"].Value);
+                    totalProductos += 1;
+                }
+                else
+                {
+                    if (int.TryParse(row.Cells["Cantidad"].Value.ToString(), out int cantidad))
+                    {
+                        totalProductos += cantidad;
+                    }
+                    else
+                    {
+                        totalProductos += 1;
+                    }
                 }
             }
+
             labelNumProductos.Text = totalProductos.ToString();
         }
+
 
         private void labelInfoCantidadProductos_Click(object sender, EventArgs e)
         {
@@ -519,35 +531,47 @@ namespace PuntoVenta
             if (e.RowIndex >= 0 && dataGridVenta.Columns[e.ColumnIndex].Name == "Eliminar")
             {
                 var fila = dataGridVenta.Rows[e.RowIndex];
-                string nombreProducto = fila.Cells["Nombre"].Value?.ToString();
-                var producto = dbContext.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
 
-                if (producto == null) return;
+                // Recuperar si es aGranel desde la columna oculta
+                bool esGranel = fila.Cells["aGranel"]?.Value != null && Convert.ToBoolean(fila.Cells["aGranel"].Value);
 
-                int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
-
-                if (cantidadActual > 1)
+                if (esGranel)
                 {
-                    cantidadActual--;
-                    fila.Cells["Cantidad"].Value = cantidadActual;
-
-                    // Validar precio
-                    decimal nuevoPrecio = cantidadActual >= producto.CantidadMinimaMayoreo
-                        ? producto.PrecioVentaMayoreo
-                        : producto.PrecioVentaUnitario;
-
-                    fila.Cells["Precio"].Value = nuevoPrecio.ToString("0.00");
-                    fila.Cells["Subtotal"].Value = (nuevoPrecio * cantidadActual).ToString("0.00");
+                    // Eliminar la fila directamente
+                    dataGridVenta.Rows.RemoveAt(e.RowIndex);
                 }
                 else
                 {
-                    dataGridVenta.Rows.RemoveAt(e.RowIndex);
+                    string nombreProducto = fila.Cells["Nombre"].Value?.ToString();
+                    var producto = dbContext.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
+                    if (producto == null) return;
+
+                    int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
+
+                    if (cantidadActual > 1)
+                    {
+                        cantidadActual--;
+                        fila.Cells["Cantidad"].Value = cantidadActual;
+
+                        // Validar precio
+                        decimal nuevoPrecio = cantidadActual >= producto.CantidadMinimaMayoreo
+                            ? producto.PrecioVentaMayoreo
+                            : producto.PrecioVentaUnitario;
+
+                        fila.Cells["Precio"].Value = nuevoPrecio.ToString("0.00");
+                        fila.Cells["Subtotal"].Value = (nuevoPrecio * cantidadActual).ToString("0.00");
+                    }
+                    else
+                    {
+                        dataGridVenta.Rows.RemoveAt(e.RowIndex);
+                    }
                 }
 
                 RecalcularTotal();
                 ActualizarCantidadProductos();
             }
         }
+
 
         private void textSuPago_TextChanged(object sender, EventArgs e)
         {
@@ -579,6 +603,21 @@ namespace PuntoVenta
             }
         }
 
+        private void dataGridVenta_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            // Verificar si se está editando la columna "Cantidad"
+            if (dataGridVenta.Columns[e.ColumnIndex].Name == "Cantidad")
+            {
+                var fila = dataGridVenta.Rows[e.RowIndex];
 
+                // Verificar si la celda aGranel está en true
+                if (fila.Cells["aGranel"].Value != null && Convert.ToBoolean(fila.Cells["aGranel"].Value))
+                {
+                    // Cancelar la edición
+                    e.Cancel = true;
+                    MessageBox.Show("Para modificar la cantidad de este producto debe eliminarse y agregarse de nuevo.", "Producto a granel", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
     }
 }
