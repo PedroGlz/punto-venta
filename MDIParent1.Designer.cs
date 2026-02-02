@@ -32,6 +32,7 @@
             menuStrip = new MenuStrip();
             ventaToolStripMenuItem = new ToolStripMenuItem();
             inventarioToolStripMenuItem = new ToolStripMenuItem();
+            reportesToolStripMenuItem = new ToolStripMenuItem();
             statusStrip = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             toolTip = new ToolTip(components);
@@ -42,7 +43,7 @@
             // menuStrip
             // 
             menuStrip.ImageScalingSize = new Size(20, 20);
-            menuStrip.Items.AddRange(new ToolStripItem[] { ventaToolStripMenuItem, inventarioToolStripMenuItem });
+            menuStrip.Items.AddRange(new ToolStripItem[] { ventaToolStripMenuItem, inventarioToolStripMenuItem, reportesToolStripMenuItem });
             menuStrip.Location = new Point(0, 0);
             menuStrip.Name = "menuStrip";
             menuStrip.Padding = new Padding(8, 3, 0, 3);
@@ -63,6 +64,13 @@
             inventarioToolStripMenuItem.Size = new Size(89, 24);
             inventarioToolStripMenuItem.Text = "Inventario";
             inventarioToolStripMenuItem.Click += inventarioToolStripMenuItem_Click;
+            // 
+            // reportesToolStripMenuItem
+            // 
+            reportesToolStripMenuItem.Name = "reportesToolStripMenuItem";
+            reportesToolStripMenuItem.Size = new Size(82, 24);
+            reportesToolStripMenuItem.Text = "Reportes";
+            reportesToolStripMenuItem.Click += reportesToolStripMenuItem_Click;
             // 
             // statusStrip
             // 
@@ -111,8 +119,10 @@
         private System.Windows.Forms.ToolTip toolTip;
         private ToolStripMenuItem inventarioToolStripMenuItem;
         private ToolStripMenuItem ventaToolStripMenuItem;
+        private ToolStripMenuItem reportesToolStripMenuItem;
     }
 }
+
 
 
 

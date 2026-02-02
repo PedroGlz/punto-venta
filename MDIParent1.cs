@@ -70,6 +70,11 @@ namespace PuntoVenta
             AbrirFormularioConUsuario<FormVenta>();
         }
 
+        private void reportesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AbrirFormularioConUsuario<ReportesForm>();
+        }
+
         private void ExitToolsStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -104,3 +109,4 @@ namespace PuntoVenta
         }
     }
 }
+
