@@ -9,6 +9,7 @@ namespace PuntoVenta
         private readonly Usuario usuarioActual;
         private DateTimePicker dtpDesde = null!;
         private DateTimePicker dtpHasta = null!;
+        private TextBox txtFolio = null!;
         private Button btnFiltrar = null!;
         private Button btnRestablecer = null!;
         private Button btnExportarVentas = null!;
@@ -55,6 +56,7 @@ namespace PuntoVenta
         {
             dtpDesde = new DateTimePicker();
             dtpHasta = new DateTimePicker();
+            txtFolio = new TextBox();
             btnFiltrar = new Button();
             btnRestablecer = new Button();
             btnExportarVentas = new Button();
@@ -64,6 +66,7 @@ namespace PuntoVenta
             splitTablas = new SplitContainer();
             var labelDesde = new Label();
             var labelHasta = new Label();
+            var labelFolio = new Label();
             var labelGeneral = new Label();
             var labelDetalle = new Label();
 
@@ -85,27 +88,34 @@ namespace PuntoVenta
             dtpHasta.Location = new Point(260, 14);
             dtpHasta.Size = new Size(130, 23);
 
+            labelFolio.AutoSize = true;
+            labelFolio.Location = new Point(406, 18);
+            labelFolio.Text = "Folio:";
+
+            txtFolio.Location = new Point(448, 14);
+            txtFolio.Size = new Size(102, 23);
+
             btnFiltrar.BackColor = Color.FromArgb(0, 64, 64);
             btnFiltrar.ForeColor = Color.White;
-            btnFiltrar.Location = new Point(410, 11);
+            btnFiltrar.Location = new Point(560, 11);
             btnFiltrar.Size = new Size(88, 29);
             btnFiltrar.Text = "Filtrar";
             btnFiltrar.UseVisualStyleBackColor = false;
             btnFiltrar.Click += btnFiltrar_Click;
 
-            btnRestablecer.Location = new Point(506, 11);
+            btnRestablecer.Location = new Point(656, 11);
             btnRestablecer.Size = new Size(98, 29);
             btnRestablecer.Text = "Restablecer";
             btnRestablecer.UseVisualStyleBackColor = true;
             btnRestablecer.Click += btnRestablecer_Click;
 
-            btnExportarVentas.Location = new Point(620, 11);
+            btnExportarVentas.Location = new Point(768, 11);
             btnExportarVentas.Size = new Size(148, 29);
             btnExportarVentas.Text = "Exportar General";
             btnExportarVentas.UseVisualStyleBackColor = true;
             btnExportarVentas.Click += btnExportarVentas_Click;
 
-            btnExportarDetalle.Location = new Point(776, 11);
+            btnExportarDetalle.Location = new Point(924, 11);
             btnExportarDetalle.Size = new Size(148, 29);
             btnExportarDetalle.Text = "Exportar Detalle";
             btnExportarDetalle.UseVisualStyleBackColor = true;
@@ -154,6 +164,8 @@ namespace PuntoVenta
             Controls.Add(dtpDesde);
             Controls.Add(labelHasta);
             Controls.Add(dtpHasta);
+            Controls.Add(labelFolio);
+            Controls.Add(txtFolio);
             Controls.Add(btnFiltrar);
             Controls.Add(btnRestablecer);
             Controls.Add(btnExportarVentas);
@@ -225,13 +237,33 @@ namespace PuntoVenta
                 return;
             }
 
+            int? folio = null;
+            if (!string.IsNullOrWhiteSpace(txtFolio.Text))
+            {
+                if (!int.TryParse(txtFolio.Text.Trim(), out var folioParseado))
+                {
+                    MessageBox.Show("El folio debe ser numerico.", "Filtro invalido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                folio = folioParseado;
+            }
+
             using var db = new AppDbContext();
 
-            var reporte = db.Ventas
+            var ventasQuery = db.Ventas
                 .AsNoTracking()
                 .Include(v => v.Usuario)
                 .Include(v => v.TipoPago)
                 .Where(v => v.Fecha >= desde && v.Fecha <= hasta)
+                .AsQueryable();
+
+            if (folio.HasValue)
+            {
+                ventasQuery = ventasQuery.Where(v => v.Folio == folio.Value);
+            }
+
+            var reporte = ventasQuery
                 .OrderByDescending(v => v.Fecha)
                 .Select(v => new VentaReporteRow
                 {
@@ -300,6 +332,7 @@ namespace PuntoVenta
         private void btnRestablecer_Click(object? sender, EventArgs e)
         {
             EstablecerRangoInicial();
+            txtFolio.Clear();
             CargarVentas();
         }
 
