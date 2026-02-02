@@ -26,6 +26,7 @@ namespace PuntoVenta
         {
             // ✅ Mostrar el nombre del usuario en el título del formulario
             this.Text = $"Punto de Venta - Sesión de: {usuarioActual.NombreUsuario}";
+            usuariosToolStripMenuItem.Visible = usuarioActual.TipoUsuarioId == 1;
         }
 
         // ✅ Método genérico para abrir formularios hijos sin parámetros
@@ -73,6 +74,11 @@ namespace PuntoVenta
         private void reportesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AbrirFormularioConUsuario<ReportesForm>();
+        }
+
+        private void usuariosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AbrirFormularioConUsuario<UsuariosCrudForm>();
         }
 
         private void ExitToolsStripMenuItem_Click(object sender, EventArgs e)
