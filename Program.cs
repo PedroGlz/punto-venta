@@ -1,5 +1,6 @@
-using PuntoVenta.Models;
+ï»¿using PuntoVenta.Models;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace PuntoVenta
@@ -13,23 +14,54 @@ namespace PuntoVenta
             Application.SetCompatibleTextRenderingDefault(false);
 
             ApplicationConfiguration.Initialize();
-            using (var db = new AppDbContext())
-            {
-                db.Database.EnsureCreated(); // Crea la base si no existe
-            }
+            InicializarBaseDatos();
 
             FormLogin login = new FormLogin();
             if (login.ShowDialog() == DialogResult.OK)
             {
-                // Si el login fue exitoso, abrimos el formulario principal
                 Usuario user = login.UsuarioAutenticado;
-                Application.Run(new MDIParent1(user)); // Cambia "Form1" por el nombre de tu formulario principal real
+                Application.Run(new MDIParent1(user));
             }
             else
             {
-                // Si se cierra el login o falla, terminamos la aplicación
                 Application.Exit();
             }
+        }
+
+        private static void InicializarBaseDatos()
+        {
+            using var db = new AppDbContext();
+            db.Database.EnsureCreated();
+
+            var tipoAdmin = db.TiposUsuario.FirstOrDefault(t => t.TipoUsuarioId == 1);
+            if (tipoAdmin == null)
+            {
+                db.TiposUsuario.Add(new TipoUsuario
+                {
+                    TipoUsuarioId = 1,
+                    Tipo = "Administrador"
+                });
+            }
+
+            var usuarioSuper = db.Usuarios.FirstOrDefault(u => u.UsuarioId == 1);
+            if (usuarioSuper == null)
+            {
+                db.Usuarios.Add(new Usuario
+                {
+                    UsuarioId = 1,
+                    NombreUsuario = "super",
+                    Password = "123",
+                    TipoUsuarioId = 1
+                });
+            }
+            else
+            {
+                usuarioSuper.NombreUsuario = "super";
+                usuarioSuper.Password = "123";
+                usuarioSuper.TipoUsuarioId = 1;
+            }
+
+            db.SaveChanges();
         }
     }
 }

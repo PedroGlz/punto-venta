@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PuntoVenta.Models;
+using System.Text;
 
 namespace PuntoVenta
 {
@@ -10,13 +11,42 @@ namespace PuntoVenta
         private DateTimePicker dtpHasta = null!;
         private Button btnFiltrar = null!;
         private Button btnRestablecer = null!;
-        private DataGridView tablaReportes = null!;
+        private Button btnExportarVentas = null!;
+        private Button btnExportarDetalle = null!;
+        private DataGridView tablaVentas = null!;
+        private DataGridView tablaDetalle = null!;
+        private SplitContainer splitTablas = null!;
+
+        private sealed class VentaReporteRow
+        {
+            public int VentaId { get; set; }
+            public int Folio { get; set; }
+            public DateTime Fecha { get; set; }
+            public string Usuario { get; set; } = string.Empty;
+            public string TipoPago { get; set; } = string.Empty;
+            public int Productos { get; set; }
+            public decimal Total { get; set; }
+            public decimal Pago { get; set; }
+            public decimal Cambio { get; set; }
+        }
+
+        private sealed class DetalleReporteRow
+        {
+            public int DetalleVentaId { get; set; }
+            public int VentaId { get; set; }
+            public int Folio { get; set; }
+            public DateTime Fecha { get; set; }
+            public string Producto { get; set; } = string.Empty;
+            public int Cantidad { get; set; }
+            public decimal PrecioUnitario { get; set; }
+            public decimal Subtotal { get; set; }
+        }
 
         public ReportesForm(Usuario usuario)
         {
             usuarioActual = usuario;
             InitializeComponent();
-            ConfigurarTabla();
+            ConfigurarTablas();
             EstablecerRangoInicial();
             CargarVentas();
         }
@@ -27,9 +57,15 @@ namespace PuntoVenta
             dtpHasta = new DateTimePicker();
             btnFiltrar = new Button();
             btnRestablecer = new Button();
-            tablaReportes = new DataGridView();
+            btnExportarVentas = new Button();
+            btnExportarDetalle = new Button();
+            tablaVentas = new DataGridView();
+            tablaDetalle = new DataGridView();
+            splitTablas = new SplitContainer();
             var labelDesde = new Label();
             var labelHasta = new Label();
+            var labelGeneral = new Label();
+            var labelDetalle = new Label();
 
             SuspendLayout();
 
@@ -63,14 +99,55 @@ namespace PuntoVenta
             btnRestablecer.UseVisualStyleBackColor = true;
             btnRestablecer.Click += btnRestablecer_Click;
 
-            tablaReportes.AllowUserToAddRows = false;
-            tablaReportes.AllowUserToDeleteRows = false;
-            tablaReportes.ReadOnly = true;
-            tablaReportes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            tablaReportes.MultiSelect = false;
-            tablaReportes.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            tablaReportes.Location = new Point(16, 52);
-            tablaReportes.Size = new Size(1248, 610);
+            btnExportarVentas.Location = new Point(620, 11);
+            btnExportarVentas.Size = new Size(148, 29);
+            btnExportarVentas.Text = "Exportar General";
+            btnExportarVentas.UseVisualStyleBackColor = true;
+            btnExportarVentas.Click += btnExportarVentas_Click;
+
+            btnExportarDetalle.Location = new Point(776, 11);
+            btnExportarDetalle.Size = new Size(148, 29);
+            btnExportarDetalle.Text = "Exportar Detalle";
+            btnExportarDetalle.UseVisualStyleBackColor = true;
+            btnExportarDetalle.Click += btnExportarDetalle_Click;
+
+            splitTablas.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            splitTablas.Location = new Point(16, 52);
+            splitTablas.Size = new Size(1248, 610);
+            splitTablas.Orientation = Orientation.Horizontal;
+            splitTablas.SplitterDistance = 285;
+
+            labelGeneral.AutoSize = true;
+            labelGeneral.Location = new Point(8, 8);
+            labelGeneral.Text = "Ventas Generales";
+
+            tablaVentas.AllowUserToAddRows = false;
+            tablaVentas.AllowUserToDeleteRows = false;
+            tablaVentas.ReadOnly = true;
+            tablaVentas.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            tablaVentas.MultiSelect = false;
+            tablaVentas.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tablaVentas.Location = new Point(8, 28);
+            tablaVentas.Size = new Size(1232, 248);
+            tablaVentas.SelectionChanged += tablaVentas_SelectionChanged;
+
+            labelDetalle.AutoSize = true;
+            labelDetalle.Location = new Point(8, 8);
+            labelDetalle.Text = "Detalle de la Venta Seleccionada";
+
+            tablaDetalle.AllowUserToAddRows = false;
+            tablaDetalle.AllowUserToDeleteRows = false;
+            tablaDetalle.ReadOnly = true;
+            tablaDetalle.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            tablaDetalle.MultiSelect = false;
+            tablaDetalle.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tablaDetalle.Location = new Point(8, 28);
+            tablaDetalle.Size = new Size(1232, 281);
+
+            splitTablas.Panel1.Controls.Add(labelGeneral);
+            splitTablas.Panel1.Controls.Add(tablaVentas);
+            splitTablas.Panel2.Controls.Add(labelDetalle);
+            splitTablas.Panel2.Controls.Add(tablaDetalle);
 
             ClientSize = new Size(1280, 680);
             Controls.Add(labelDesde);
@@ -79,7 +156,9 @@ namespace PuntoVenta
             Controls.Add(dtpHasta);
             Controls.Add(btnFiltrar);
             Controls.Add(btnRestablecer);
-            Controls.Add(tablaReportes);
+            Controls.Add(btnExportarVentas);
+            Controls.Add(btnExportarDetalle);
+            Controls.Add(splitTablas);
             Name = "ReportesForm";
             Text = $"Reportes de Ventas - Usuario: {usuarioActual.NombreUsuario}";
 
@@ -87,10 +166,34 @@ namespace PuntoVenta
             PerformLayout();
         }
 
-        private void ConfigurarTabla()
+        private void ConfigurarTablas()
         {
-            tablaReportes.AutoGenerateColumns = true;
-            tablaReportes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            tablaVentas.AutoGenerateColumns = false;
+            tablaVentas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            tablaVentas.Columns.Clear();
+
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { Name = "VentaId", DataPropertyName = "VentaId", Visible = false });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Folio", DataPropertyName = "Folio" });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Fecha", DataPropertyName = "Fecha", DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy HH:mm" } });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Usuario", DataPropertyName = "Usuario" });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tipo Pago", DataPropertyName = "TipoPago" });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Productos", DataPropertyName = "Productos" });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Total", DataPropertyName = "Total", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Pago", DataPropertyName = "Pago", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            tablaVentas.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Cambio", DataPropertyName = "Cambio", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+
+            tablaDetalle.AutoGenerateColumns = false;
+            tablaDetalle.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            tablaDetalle.Columns.Clear();
+
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { Name = "DetalleVentaId", DataPropertyName = "DetalleVentaId", Visible = false });
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { Name = "VentaId", DataPropertyName = "VentaId", Visible = false });
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Folio", DataPropertyName = "Folio" });
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Fecha", DataPropertyName = "Fecha", DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy HH:mm" } });
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Producto", DataPropertyName = "Producto" });
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Cantidad", DataPropertyName = "Cantidad" });
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Precio Unit.", DataPropertyName = "PrecioUnitario", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            tablaDetalle.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Subtotal", DataPropertyName = "Subtotal", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
         }
 
         private void EstablecerRangoInicial()
@@ -118,7 +221,7 @@ namespace PuntoVenta
 
             if (hasta < desde)
             {
-                MessageBox.Show("La fecha final no puede ser menor a la fecha inicial.", "Filtro inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("La fecha final no puede ser menor a la fecha inicial.", "Filtro invalido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -130,8 +233,9 @@ namespace PuntoVenta
                 .Include(v => v.TipoPago)
                 .Where(v => v.Fecha >= desde && v.Fecha <= hasta)
                 .OrderByDescending(v => v.Fecha)
-                .Select(v => new
+                .Select(v => new VentaReporteRow
                 {
+                    VentaId = v.VentaId,
                     Folio = v.Folio,
                     Fecha = v.Fecha,
                     Usuario = v.Usuario.NombreUsuario,
@@ -143,19 +247,49 @@ namespace PuntoVenta
                 })
                 .ToList();
 
-            tablaReportes.DataSource = reporte;
+            tablaVentas.DataSource = reporte;
 
-            if (tablaReportes.Columns.Contains("Fecha"))
-                tablaReportes.Columns["Fecha"].DefaultCellStyle.Format = "dd/MM/yyyy HH:mm";
+            if (reporte.Count > 0)
+            {
+                tablaVentas.ClearSelection();
+                tablaVentas.Rows[0].Selected = true;
+                CargarDetalleVenta(reporte[0].VentaId);
+            }
+            else
+            {
+                tablaDetalle.DataSource = new List<DetalleReporteRow>();
+            }
+        }
 
-            if (tablaReportes.Columns.Contains("Total"))
-                tablaReportes.Columns["Total"].DefaultCellStyle.Format = "C2";
+        private void CargarDetalleVenta(int ventaId)
+        {
+            using var db = new AppDbContext();
 
-            if (tablaReportes.Columns.Contains("Pago"))
-                tablaReportes.Columns["Pago"].DefaultCellStyle.Format = "C2";
+            var detalle = db.DetallesVenta
+                .AsNoTracking()
+                .Where(d => d.VentaId == ventaId)
+                .Join(db.Ventas.AsNoTracking(),
+                    d => d.VentaId,
+                    v => v.VentaId,
+                    (d, v) => new { d, v })
+                .Join(db.Productos.AsNoTracking(),
+                    dv => dv.d.ProductoId,
+                    p => p.ProductoId,
+                    (dv, p) => new DetalleReporteRow
+                    {
+                        DetalleVentaId = dv.d.DetalleVentaId,
+                        VentaId = dv.v.VentaId,
+                        Folio = dv.v.Folio,
+                        Fecha = dv.v.Fecha,
+                        Producto = p.Nombre,
+                        Cantidad = dv.d.Cantidad,
+                        PrecioUnitario = dv.d.PrecioUnitario,
+                        Subtotal = dv.d.Subtotal
+                    })
+                .OrderBy(d => d.DetalleVentaId)
+                .ToList();
 
-            if (tablaReportes.Columns.Contains("Cambio"))
-                tablaReportes.Columns["Cambio"].DefaultCellStyle.Format = "C2";
+            tablaDetalle.DataSource = detalle;
         }
 
         private void btnFiltrar_Click(object? sender, EventArgs e)
@@ -165,9 +299,83 @@ namespace PuntoVenta
 
         private void btnRestablecer_Click(object? sender, EventArgs e)
         {
-            dtpDesde.Value = DateTime.Today;
-            dtpHasta.Value = DateTime.Today;
+            EstablecerRangoInicial();
             CargarVentas();
+        }
+
+        private void tablaVentas_SelectionChanged(object? sender, EventArgs e)
+        {
+            if (tablaVentas.CurrentRow?.DataBoundItem is VentaReporteRow venta)
+            {
+                CargarDetalleVenta(venta.VentaId);
+            }
+        }
+
+        private void btnExportarVentas_Click(object? sender, EventArgs e)
+        {
+            ExportarDataGridACsv(tablaVentas, "reporte_ventas_general");
+        }
+
+        private void btnExportarDetalle_Click(object? sender, EventArgs e)
+        {
+            ExportarDataGridACsv(tablaDetalle, "reporte_ventas_detalle");
+        }
+
+        private static void ExportarDataGridACsv(DataGridView grid, string nombreBase)
+        {
+            if (grid.Rows.Count == 0)
+            {
+                MessageBox.Show("No hay datos para exportar.", "Exportar", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using var dialog = new SaveFileDialog
+            {
+                Filter = "CSV compatible con Excel (*.csv)|*.csv",
+                FileName = $"{nombreBase}_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
+            };
+
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            try
+            {
+                var columnasVisibles = grid.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Where(c => c.Visible)
+                    .OrderBy(c => c.DisplayIndex)
+                    .ToList();
+
+                var sb = new StringBuilder();
+                sb.AppendLine(string.Join(",", columnasVisibles.Select(c => EscaparCsv(c.HeaderText))));
+
+                foreach (DataGridViewRow row in grid.Rows)
+                {
+                    if (row.IsNewRow)
+                        continue;
+
+                    var valores = columnasVisibles.Select(col =>
+                    {
+                        var valor = row.Cells[col.Index].Value?.ToString() ?? string.Empty;
+                        return EscaparCsv(valor);
+                    });
+
+                    sb.AppendLine(string.Join(",", valores));
+                }
+
+                File.WriteAllText(dialog.FileName, sb.ToString(), new UTF8Encoding(true));
+                MessageBox.Show("Archivo exportado correctamente.", "Exportar", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo exportar el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static string EscaparCsv(string valor)
+        {
+            var limpio = valor.Replace("\"", "\"\"");
+            return $"\"{limpio}\"";
         }
     }
 }
