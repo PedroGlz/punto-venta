@@ -210,20 +210,8 @@ namespace PuntoVenta
 
         private void EstablecerRangoInicial()
         {
-            using var db = new AppDbContext();
-            var primeraVenta = db.Ventas.AsNoTracking().OrderBy(v => v.Fecha).Select(v => (DateTime?)v.Fecha).FirstOrDefault();
-            var ultimaVenta = db.Ventas.AsNoTracking().OrderByDescending(v => v.Fecha).Select(v => (DateTime?)v.Fecha).FirstOrDefault();
-
-            if (primeraVenta.HasValue && ultimaVenta.HasValue)
-            {
-                dtpDesde.Value = primeraVenta.Value.Date;
-                dtpHasta.Value = ultimaVenta.Value.Date;
-            }
-            else
-            {
-                dtpDesde.Value = DateTime.Today;
-                dtpHasta.Value = DateTime.Today;
-            }
+            dtpDesde.Value = DateTime.Today;
+            dtpHasta.Value = DateTime.Today;
         }
 
         private void CargarVentas()
