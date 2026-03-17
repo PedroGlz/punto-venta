@@ -1,7 +1,7 @@
-﻿using PuntoVenta.Models;
 using System;
 using System.Linq;
 using System.Windows.Forms;
+using PuntoVenta.Models;
 
 namespace PuntoVenta
 {

@@ -14,6 +14,7 @@ namespace PuntoVenta
         private Button btnRestablecer = null!;
         private Button btnExportarVentas = null!;
         private Button btnExportarDetalle = null!;
+        private Label lblTotalFiltro = null!;
         private DataGridView tablaVentas = null!;
         private DataGridView tablaDetalle = null!;
         private SplitContainer splitTablas = null!;
@@ -38,7 +39,7 @@ namespace PuntoVenta
             public int Folio { get; set; }
             public DateTime Fecha { get; set; }
             public string Producto { get; set; } = string.Empty;
-            public int Cantidad { get; set; }
+            public string Cantidad { get; set; } = string.Empty;
             public decimal PrecioUnitario { get; set; }
             public decimal Subtotal { get; set; }
         }
@@ -69,6 +70,7 @@ namespace PuntoVenta
             var labelFolio = new Label();
             var labelGeneral = new Label();
             var labelDetalle = new Label();
+            lblTotalFiltro = new Label();
 
             SuspendLayout();
 
@@ -121,6 +123,20 @@ namespace PuntoVenta
             btnExportarDetalle.UseVisualStyleBackColor = true;
             btnExportarDetalle.Click += btnExportarDetalle_Click;
 
+            lblTotalFiltro.AutoSize = false;
+            lblTotalFiltro.AutoEllipsis = true;
+            lblTotalFiltro.Location = new Point(860, 8);
+            lblTotalFiltro.Size = new Size(410, 42);
+            lblTotalFiltro.MinimumSize = new Size(340, 42);
+            lblTotalFiltro.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblTotalFiltro.TextAlign = ContentAlignment.MiddleCenter;
+            lblTotalFiltro.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblTotalFiltro.ForeColor = Color.White;
+            lblTotalFiltro.BackColor = Color.FromArgb(32, 74, 135);
+            lblTotalFiltro.Padding = new Padding(12, 10, 12, 10);
+            lblTotalFiltro.BorderStyle = BorderStyle.Fixed3D;
+            lblTotalFiltro.Text = "Total filtrado: $0.00";
+
             splitTablas.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             splitTablas.Location = new Point(16, 52);
             splitTablas.Size = new Size(1248, 610);
@@ -170,6 +186,7 @@ namespace PuntoVenta
             Controls.Add(btnRestablecer);
             Controls.Add(btnExportarVentas);
             Controls.Add(btnExportarDetalle);
+            Controls.Add(lblTotalFiltro);
             Controls.Add(splitTablas);
             Name = "ReportesForm";
             Text = $"Reportes de Ventas - Usuario: {usuarioActual.NombreUsuario}";
@@ -267,6 +284,9 @@ namespace PuntoVenta
                 })
                 .ToList();
 
+            var totalFiltrado = reporte.Sum(r => r.Total);
+            lblTotalFiltro.Text = $"Total filtrado: {totalFiltrado:C2}";
+
             tablaVentas.DataSource = reporte;
 
             if (reporte.Count > 0)
@@ -292,7 +312,7 @@ namespace PuntoVenta
                     d => d.VentaId,
                     v => v.VentaId,
                     (d, v) => new { d, v })
-                .Join(db.Productos.AsNoTracking(),
+                        .Join(db.Productos.AsNoTracking(),
                     dv => dv.d.ProductoId,
                     p => p.ProductoId,
                     (dv, p) => new DetalleReporteRow
@@ -302,7 +322,7 @@ namespace PuntoVenta
                         Folio = dv.v.Folio,
                         Fecha = dv.v.Fecha,
                         Producto = p.Nombre,
-                        Cantidad = dv.d.Cantidad,
+                        Cantidad = FormatearCantidadDetalle(dv.d.Cantidad, dv.d.CantidadDecimal, p.aGranel),
                         PrecioUnitario = dv.d.PrecioUnitario,
                         Subtotal = dv.d.Subtotal
                     })
@@ -332,17 +352,64 @@ namespace PuntoVenta
             }
         }
 
+        private static string FormatearCantidadDetalle(int cantidad, decimal cantidadDecimal, bool esGranel)
+        {
+            if (!esGranel)
+                return cantidad.ToString();
+
+            var cantidadGramos = cantidadDecimal > 0 ? cantidadDecimal : cantidad;
+            if (cantidadGramos <= 0)
+                return "0 g";
+
+            if (cantidadGramos < 1000)
+                return $"{cantidadGramos:0.##} g";
+
+            var kilos = cantidadGramos / 1000m;
+            if (kilos == Math.Truncate(kilos))
+                return $"{kilos:0} kg";
+
+            return $"{kilos:0.##} kg";
+        }
+
         private void btnExportarVentas_Click(object? sender, EventArgs e)
         {
-            ExportarDataGridACsv(tablaVentas, "reporte_ventas_general");
+            decimal total = ObtenerTotalColumna(tablaVentas, "Total");
+            ExportarDataGridACsv(tablaVentas, "reporte_ventas_general", "Total", total);
         }
 
         private void btnExportarDetalle_Click(object? sender, EventArgs e)
         {
-            ExportarDataGridACsv(tablaDetalle, "reporte_ventas_detalle");
+            decimal total = ObtenerTotalColumna(tablaDetalle, "Subtotal");
+            ExportarDataGridACsv(tablaDetalle, "reporte_ventas_detalle", "Subtotal", total);
         }
 
-        private static void ExportarDataGridACsv(DataGridView grid, string nombreBase)
+        private static decimal ObtenerTotalColumna(DataGridView grid, string columnaObjetivo)
+        {
+            var columna = grid.Columns.Cast<DataGridViewColumn>()
+                .FirstOrDefault(c => string.Equals(c.HeaderText, columnaObjetivo, StringComparison.OrdinalIgnoreCase));
+            if (columna == null)
+                return 0m;
+
+            decimal total = 0m;
+            foreach (DataGridViewRow row in grid.Rows)
+            {
+                if (row.IsNewRow)
+                    continue;
+
+                var valor = row.Cells[columna.Index].Value;
+                if (valor == null || string.IsNullOrWhiteSpace(valor.ToString()))
+                    continue;
+
+                if (decimal.TryParse(valor.ToString(), System.Globalization.NumberStyles.Currency, null, out decimal monto))
+                    total += monto;
+                else if (decimal.TryParse(valor.ToString(), out monto))
+                    total += monto;
+            }
+
+            return total;
+        }
+
+        private static void ExportarDataGridACsv(DataGridView grid, string nombreBase, string? columnaTotal = null, decimal? total = null)
         {
             if (grid.Rows.Count == 0)
             {
@@ -382,6 +449,22 @@ namespace PuntoVenta
                     });
 
                     sb.AppendLine(string.Join(",", valores));
+                }
+
+                if (!string.IsNullOrWhiteSpace(columnaTotal) && total.HasValue)
+                {
+                    var filaTotal = new string[columnasVisibles.Count];
+                    filaTotal[0] = EscaparCsv("TOTAL");
+
+                    var columnaTotalIndice = columnasVisibles.FindIndex(c =>
+                        string.Equals(c.HeaderText, columnaTotal, StringComparison.OrdinalIgnoreCase));
+
+                    if (columnaTotalIndice >= 0 && columnaTotalIndice < filaTotal.Length)
+                    {
+                        filaTotal[columnaTotalIndice] = EscaparCsv(total.Value.ToString("C2"));
+                    }
+
+                    sb.AppendLine(string.Join(",", filaTotal));
                 }
 
                 File.WriteAllText(dialog.FileName, sb.ToString(), new UTF8Encoding(true));

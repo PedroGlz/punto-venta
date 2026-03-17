@@ -192,7 +192,8 @@ namespace PuntoVenta
                 1,
                 precioInicial.ToString("0.00"),
                 producto.Gtin,
-                producto.aGranel
+                producto.aGranel,
+                0
             );
 
             RecalcularTotal();
@@ -202,25 +203,17 @@ namespace PuntoVenta
         private void AgregarProductoGranelAlGrid(Producto producto, decimal cantidad, decimal precioUnitario)
         {
             decimal subtotal = (precioUnitario / 1000) * cantidad;
-
-            string peso = "";
-
-            if (cantidad == 1000)
-            {
-                peso = "1 kg"; // Asegurarse de que sea al menos 1 kg
-            }
-            else
-            {
-                peso = cantidad.ToString() + " g";
-            }
+            var descripcionPeso = FormatearDescripcionPeso(cantidad);
+            var nombreConPeso = $"{producto.Nombre} {descripcionPeso}".Trim();
 
             dataGridVenta.Rows.Add(
-                producto.Nombre,
+                nombreConPeso,
                 precioUnitario.ToString("0.00"),
-                peso, // mostrar gramos con 3 decimales y concatenar "kg"
+                1,
                 subtotal.ToString("0.00"),
                 producto.Gtin,
-                producto.aGranel
+                producto.aGranel,
+                cantidad
             );
 
             RecalcularTotal();
@@ -244,6 +237,8 @@ namespace PuntoVenta
             dataGridVenta.Columns["Gtin"].Visible = false;
             dataGridVenta.Columns.Add("aGranel", "aGranel");
             dataGridVenta.Columns["aGranel"].Visible = false;
+            dataGridVenta.Columns.Add("CantidadGranel", "CantidadGranel");
+            dataGridVenta.Columns["CantidadGranel"].Visible = false;
 
             dataGridVenta.Columns["Nombre"].ReadOnly = true;
             dataGridVenta.Columns["Precio"].ReadOnly = true;
@@ -272,6 +267,12 @@ namespace PuntoVenta
             if (e.ColumnIndex == dataGridVenta.Columns["Cantidad"].Index && e.RowIndex >= 0)
             {
                 var fila = dataGridVenta.Rows[e.RowIndex];
+                bool esGranel = fila.Cells["aGranel"] != null && Convert.ToBoolean(fila.Cells["aGranel"].Value);
+                if (esGranel)
+                {
+                    return;
+                }
+
                 string nombreProducto = fila.Cells["Nombre"].Value?.ToString();
                 var producto = dbContext.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
                 if (producto == null) return;
@@ -417,12 +418,21 @@ namespace PuntoVenta
             {
                 if (row.IsNewRow) continue;
 
-                string nombreProducto = row.Cells["Nombre"].Value?.ToString();
-                var producto = db.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
+                string gtin = row.Cells["Gtin"]?.Value?.ToString();
+                var producto = !string.IsNullOrWhiteSpace(gtin)
+                    ? db.Productos.FirstOrDefault(p => p.Gtin == gtin)
+                    : null;
+
+                if (producto == null)
+                {
+                    string nombreProducto = row.Cells["Nombre"].Value?.ToString();
+                    producto = db.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
+                }
 
                 if (producto == null) continue;
 
-                var cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                int cantidad = ObtenerCantidadEntera(row);
+                if (cantidad <= 0) continue;
                 var precioUnitario = Convert.ToDecimal(row.Cells["Precio"].Value);
                 var subtotal = Convert.ToDecimal(row.Cells["Subtotal"].Value);
 
@@ -431,6 +441,7 @@ namespace PuntoVenta
                     VentaId = venta.VentaId,
                     ProductoId = producto.ProductoId,
                     Cantidad = cantidad,
+                    CantidadDecimal = ObtenerCantidadDecimal(row),
                     PrecioUnitario = precioUnitario,
                     Subtotal = subtotal
                 };
@@ -450,6 +461,52 @@ namespace PuntoVenta
             }
         }
 
+
+        private int ObtenerCantidadEntera(DataGridViewRow row)
+        {
+            bool esGranel = row.Cells["aGranel"] != null && Convert.ToBoolean(row.Cells["aGranel"].Value);
+            if (esGranel)
+            {
+                return 1;
+            }
+
+            return int.TryParse(row.Cells["Cantidad"].Value?.ToString(), out var cantidadNormal) && cantidadNormal > 0 ? cantidadNormal : 0;
+        }
+
+        private decimal ObtenerCantidadDecimal(DataGridViewRow row)
+        {
+            bool esGranel = row.Cells["aGranel"] != null && Convert.ToBoolean(row.Cells["aGranel"].Value);
+            if (!esGranel)
+            {
+                return int.TryParse(row.Cells["Cantidad"].Value?.ToString(), out var cantidadNormal) && cantidadNormal > 0
+                    ? cantidadNormal
+                    : 1m;
+            }
+
+            if (decimal.TryParse(row.Cells["CantidadGranel"]?.Value?.ToString(), out var cantidadGranel) && cantidadGranel > 0)
+            {
+                return cantidadGranel;
+            }
+
+            return 1m;
+        }
+
+        private string FormatearDescripcionPeso(decimal cantidadGramos)
+        {
+            if (cantidadGramos >= 1000)
+            {
+                var kilos = cantidadGramos / 1000m;
+                if (kilos == Math.Truncate(kilos))
+                    return $"{kilos:0} kg";
+
+                return $"{kilos:0.##} kg";
+            }
+
+            if (cantidadGramos == Math.Truncate(cantidadGramos))
+                return $"{cantidadGramos:0} g";
+
+            return $"{cantidadGramos:0.##} g";
+        }
 
         private void LimpiarFormularioVenta()
         {
@@ -497,6 +554,11 @@ namespace PuntoVenta
                 string nombreProducto = fila.Cells["Nombre"].Value?.ToString();
                 var producto = dbContext.Productos.FirstOrDefault(p => p.Nombre == nombreProducto);
                 if (producto == null) return;
+
+                if (fila.Cells["aGranel"] != null && Convert.ToBoolean(fila.Cells["aGranel"].Value))
+                {
+                    return;
+                }
 
                 if (!int.TryParse(fila.Cells["Cantidad"].Value?.ToString(), out int nuevaCantidad) || nuevaCantidad <= 0)
                 {

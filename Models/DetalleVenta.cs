@@ -12,6 +12,7 @@ namespace PuntoVenta.Models
         public int VentaId { get; set; }
         public int ProductoId { get; set; }
         public int Cantidad { get; set; }  // Cantidad vendida de ese producto
+        public decimal CantidadDecimal { get; set; }  // Cantidad real vendida; para granel usa gramos exactos
         public decimal PrecioUnitario { get; set; }
         public decimal Subtotal { get; set; }  // Subtotal de la venta de ese producto (Cantidad * PrecioUnitario)
         // Opcional: Relaciones
