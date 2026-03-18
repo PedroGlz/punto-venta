@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using PuntoVenta.Models;
 
@@ -10,22 +13,52 @@ namespace PuntoVenta
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            ConfigurarManejoGlobalDeErrores();
 
-            ApplicationConfiguration.Initialize();
-            InicializarBaseDatos();
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            FormLogin login = new FormLogin();
-            if (login.ShowDialog() == DialogResult.OK)
-            {
-                Usuario user = login.UsuarioAutenticado;
-                Application.Run(new MDIParent1(user));
+                ApplicationConfiguration.Initialize();
+                InicializarBaseDatos();
+
+                FormLogin login = new FormLogin();
+                if (login.ShowDialog() == DialogResult.OK)
+                {
+                    Usuario user = login.UsuarioAutenticado;
+                    Application.Run(new MDIParent1(user));
+                }
+                else
+                {
+                    Application.Exit();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Application.Exit();
+                EscribirLogFatal("Excepción fatal en Main()", ex);
+                MostrarMensajeError(ex);
             }
+        }
+
+        private static void ConfigurarManejoGlobalDeErrores()
+        {
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+
+            Application.ThreadException += (sender, exArgs) =>
+            {
+                EscribirLogFatal("Excepción no controlada en hilo de UI", exArgs.Exception);
+                MostrarMensajeError(exArgs.Exception);
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, exArgs) =>
+            {
+                Exception ex = exArgs.ExceptionObject as Exception
+                               ?? new Exception("Se produjo una excepción no controlada no convertible a Exception.");
+
+                EscribirLogFatal("Excepción no controlada de AppDomain", ex);
+                MostrarMensajeError(ex);
+            };
         }
 
         private static void InicializarBaseDatos()
@@ -71,6 +104,124 @@ namespace PuntoVenta
             }
 
             registro.Tipo = tipo;
+        }
+
+        private static void EscribirLogFatal(string titulo, Exception ex)
+        {
+            try
+            {
+                string rutaLog = ObtenerRutaLog();
+                string separador = new string('=', 100);
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine(separador);
+                sb.AppendLine("PUNTOVENTA - LOG FATAL");
+                sb.AppendLine(separador);
+                sb.AppendLine($"Fecha: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                sb.AppendLine($"Equipo: {Environment.MachineName}");
+                sb.AppendLine($"Usuario Windows: {Environment.UserName}");
+                sb.AppendLine($"Sistema Operativo: {Environment.OSVersion}");
+                sb.AppendLine($"Versión .NET: {Environment.Version}");
+                sb.AppendLine($"Directorio actual: {Environment.CurrentDirectory}");
+                sb.AppendLine($"BaseDirectory: {AppDomain.CurrentDomain.BaseDirectory}");
+                sb.AppendLine($"Título: {titulo}");
+                sb.AppendLine();
+
+                if (ex != null)
+                {
+                    sb.AppendLine("Mensaje:");
+                    sb.AppendLine(ex.Message);
+                    sb.AppendLine();
+
+                    sb.AppendLine("Tipo de excepción:");
+                    sb.AppendLine(ex.GetType().FullName);
+                    sb.AppendLine();
+
+                    sb.AppendLine("StackTrace:");
+                    sb.AppendLine(ex.StackTrace);
+                    sb.AppendLine();
+
+                    Exception inner = ex.InnerException;
+                    int nivel = 1;
+
+                    while (inner != null)
+                    {
+                        sb.AppendLine($"InnerException Nivel {nivel}:");
+                        sb.AppendLine(inner.GetType().FullName);
+                        sb.AppendLine(inner.Message);
+                        sb.AppendLine(inner.StackTrace);
+                        sb.AppendLine();
+
+                        inner = inner.InnerException;
+                        nivel++;
+                    }
+                }
+                else
+                {
+                    sb.AppendLine("No se recibió información de la excepción.");
+                }
+
+                sb.AppendLine();
+
+                File.AppendAllText(rutaLog, sb.ToString(), Encoding.UTF8);
+            }
+            catch
+            {
+                // Si incluso el log falla, evitamos otro crash aquí.
+            }
+        }
+
+        private static string ObtenerRutaLog()
+        {
+            try
+            {
+                string rutaExe = AppDomain.CurrentDomain.BaseDirectory;
+                string rutaLogExe = Path.Combine(rutaExe, "fatal.log");
+
+                using (FileStream fs = new FileStream(rutaLogExe, FileMode.Append, FileAccess.Write, FileShare.Read))
+                {
+                    // Solo probamos que se pueda escribir.
+                }
+
+                return rutaLogExe;
+            }
+            catch
+            {
+                string carpetaLocal = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "PuntoVenta"
+                );
+
+                Directory.CreateDirectory(carpetaLocal);
+                return Path.Combine(carpetaLocal, "fatal.log");
+            }
+        }
+
+        private static void MostrarMensajeError(Exception ex)
+        {
+            try
+            {
+                string rutaLog = ObtenerRutaLog();
+
+                MessageBox.Show(
+                    "La aplicación encontró un error y se cerrará.\n\n" +
+                    "Se generó un archivo de diagnóstico en:\n" +
+                    rutaLog + "\n\n" +
+                    "Detalle:\n" + ex.Message,
+                    "Error en PuntoVenta",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
+            catch
+            {
+                MessageBox.Show(
+                    "La aplicación encontró un error y se cerrará.",
+                    "Error en PuntoVenta",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
         }
     }
 }
